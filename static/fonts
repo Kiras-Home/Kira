@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Kira Chat Dashboard{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="text-kira-primary">Chat Dashboard</h1>
+    <p>Hier können Sie Ihre Chatverläufe einsehen und verwalten.</p>
+    <!-- Additional content goes here -->
+</div>
+{% endblock %}

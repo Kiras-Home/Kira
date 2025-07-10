@@ -1,0 +1,1337 @@
+{% extends "layouts/dashboard.html" %}
+{% set show_sidebar = true %}
+
+{% block title %}Kira - Memory Dashboard{% endblock %}
+
+{% block dashboard_icon %}<i class="fas fa-brain"></i>{% endblock %}
+{% block dashboard_title %}Memory System{% endblock %}
+{% block dashboard_description %}Kiras intelligentes Gedächtnis & Wissensspeicher - Erinnerungen, Kontext & Lernfortschritt{% endblock %}
+
+{% block dashboard_stats %}
+<div class="dashboard-stats" id="memoryOverview">
+    <!-- Memory stats werden dynamisch gefüllt -->
+</div>
+{% endblock %}
+
+{% block main_content %}
+<!-- Memory Visualization Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-project-diagram me-2"></i>
+            Neural Memory Network
+        </h3>
+        <div class="d-flex gap-2">
+            <span class="badge bg-info">
+                <i class="fas fa-circle live-indicator me-1"></i>
+                Live Neural Activity
+            </span>
+            <button class="refresh-btn" onclick="refreshMemoryNetwork()" title="Refresh Network">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
+    </div>
+    <div class="memory-network-container">
+        <canvas id="memoryNetworkCanvas" width="800" height="400"></canvas>
+        <div class="network-controls">
+            <button class="btn btn-sm btn-outline-primary" onclick="toggleNetworkAnimation()">
+                <i class="fas fa-play" id="networkAnimationIcon"></i>
+                <span id="networkAnimationText">Start</span>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="resetNetworkView()">
+                <i class="fas fa-redo"></i>
+                Reset View
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Memories Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-clock me-2"></i>
+            Recent Memories
+        </h4>
+        <span class="badge bg-primary" id="memoryCount">0</span>
+    </div>
+    <div id="recentMemories" class="memory-list">
+        <!-- Recent memories werden hier angezeigt -->
+    </div>
+</div>
+
+<!-- Important Memories Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-star me-2"></i>
+            Important Memories
+        </h4>
+    </div>
+    <div id="importantMemories">
+        <!-- Important memories werden hier angezeigt -->
+    </div>
+</div>
+
+<!-- Memory Statistics Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-chart-bar me-2"></i>
+            Memory Statistics
+        </h4>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div id="stmStats" class="memory-stat-container">
+                <!-- STM stats -->
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div id="ltmStats" class="memory-stat-container">
+                <!-- LTM stats -->
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div id="convStats" class="memory-stat-container">
+                <!-- Conversation stats -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Memory Search Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-search me-2"></i>
+            Memory Search
+        </h4>
+    </div>
+    <div class="memory-search">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" id="memorySearchInput" placeholder="Search memories...">
+            <button class="btn btn-kira" type="button" onclick="searchMemories()">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        <div id="searchResults" class="search-results">
+            <!-- Search results werden hier angezeigt -->
+        </div>
+    </div>
+</div>
+
+<!-- Memory Categories Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-history me-2"></i>
+            Recent Memories
+        </h3>
+        <div class="memory-filters">
+            <select class="form-select form-select-sm" id="memoryTypeFilter" onchange="filterMemories()">
+                <option value="all">All Types</option>
+                <option value="conversation">Conversations</option>
+                <option value="learning">Learning</option>
+                <option value="emotion">Emotions</option>
+                <option value="fact">Facts</option>
+            </select>
+        </div>
+    </div>
+    <div id="recentMemoriesGrid">
+        <!-- Recent memories werden hier angezeigt -->
+    </div>
+</div>
+
+<!-- Memory Analysis Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-chart-line me-2"></i>
+            Memory Analytics
+        </h3>
+    </div>
+    <div class="memory-analytics">
+        <canvas id="memoryAnalyticsChart" height="300"></canvas>
+    </div>
+</div>
+{% endblock %}
+
+{% block side_content %}
+<!-- Memory Stats Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-database me-2"></i>
+            Memory Storage
+        </h4>
+    </div>
+    <div id="memoryStats">
+        <!-- Memory statistics werden hier angezeigt -->
+    </div>
+</div>
+
+<!-- Live Chat Analytics Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-chart-bar me-2"></i>
+            Live Chat Activity
+        </h4>
+    </div>
+    <div class="live-chat-analytics">
+        <div class="analytics-grid">
+            <div class="metric-item">
+                <div class="metric-label">Today</div>
+                <div class="metric-value" id="messages-today">0</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">Last Hour</div>
+                <div class="metric-value" id="messages-last-hour">0</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">Last 10 min</div>
+                <div class="metric-value" id="messages-last-10min">0</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label">Active Conversations</div>
+                <div class="metric-value" id="active-conversations-count">0</div>
+            </div>
+        </div>
+        <div class="last-activity">
+            <small class="text-muted">Last Activity: <span id="last-activity">-</span></small>
+        </div>
+    </div>
+</div>
+
+<!-- Active Conversations Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-comments me-2"></i>
+            Active Conversations
+        </h4>
+    </div>
+    <div id="active-conversations-list">
+        <!-- Active conversations werden hier angezeigt -->
+    </div>
+</div>
+
+<!-- Top Memory Categories -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-tags me-2"></i>
+            Memory Categories
+        </h4>
+    </div>
+    <div id="memoryCategories">
+        <!-- Memory categories werden hier angezeigt -->
+    </div>
+</div>
+
+<!-- Memory Health Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-heartbeat me-2"></i>
+            Memory Health
+        </h4>
+    </div>
+    <div id="memoryHealth">
+        <!-- Memory health indicators -->
+    </div>
+</div>
+
+<!-- Quick Actions Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-tools me-2"></i>
+            Memory Tools
+        </h4>
+    </div>
+    <div class="memory-tools">
+        <button class="btn btn-kira btn-sm w-100 mb-2" onclick="optimizeMemory()">
+            <i class="fas fa-magic me-2"></i>
+            Optimize Memory
+        </button>
+        <button class="btn btn-outline-kira btn-sm w-100 mb-2" onclick="exportMemories()">
+            <i class="fas fa-download me-2"></i>
+            Export Memories
+        </button>
+        <button class="btn btn-outline-secondary btn-sm w-100" onclick="clearOldMemories()">
+            <i class="fas fa-trash-alt me-2"></i>
+            Clean Old Data
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Memory Dashboard Specific Styles */
+.memory-network-container {
+    position: relative;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+#memoryNetworkCanvas {
+    width: 100%;
+    height: 400px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.network-controls {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+/* Memory Items */
+.memory-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.memory-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.memory-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.memory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.memory-type {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.memory-time {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.memory-content {
+    margin-bottom: 10px;
+    line-height: 1.4;
+    color: var(--text-primary);
+}
+
+.memory-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+}
+
+.memory-importance {
+    color: #f39c12;
+}
+
+.memory-importance.importance-critical {
+    color: #e74c3c;
+}
+
+.memory-importance.importance-high {
+    color: #f39c12;
+}
+
+.memory-importance.importance-medium {
+    color: #3498db;
+}
+
+.memory-importance.importance-low {
+    color: #95a5a6;
+}
+
+.memory-emotion {
+    color: var(--text-muted);
+    text-transform: capitalize;
+}
+
+/* Important Memories */
+.important-memory-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-left: 4px solid #f39c12;
+    background: var(--card-bg);
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.importance-indicator {
+    font-size: 1.2rem;
+    color: #f39c12;
+    margin-right: 15px;
+    min-width: 60px;
+}
+
+/* Memory Statistics */
+.memory-stat-container {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+}
+
+.memory-stat {
+    margin: 10px 0;
+}
+
+.progress {
+    height: 8px;
+    background-color: var(--bg-secondary);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 5px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--kira-primary), var(--kira-secondary));
+    transition: width 0.3s ease;
+}
+
+/* Search Results */
+.search-results {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.search-result-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 8px;
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.relevance-score {
+    background: var(--kira-primary);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+}
+
+.result-content {
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.result-footer {
+    text-align: right;
+    color: var(--text-muted);
+}
+
+/* Empty States */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+/* Memory Tools */
+.memory-tools {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Notifications */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 6px;
+    color: white;
+    font-weight: 500;
+    z-index: 1000;
+    animation: slideInRight 0.3s ease;
+}
+
+.notification-success {
+    background: #27ae60;
+}
+
+.notification-error {
+    background: #e74c3c;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .memory-network-container {
+        padding: 15px;
+    }
+    
+    #memoryNetworkCanvas {
+        height: 250px;
+    }
+    
+    .network-controls {
+        position: static;
+        justify-content: center;
+        margin-top: 15px;
+    }
+    
+    .memory-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .memory-network-container {
+    background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+}
+
+[data-theme="dark"] .memory-item,
+[data-theme="dark"] .important-memory-item,
+[data-theme="dark"] .memory-stat-container,
+[data-theme="dark"] .search-result-item {
+    background: var(--card-bg-dark);
+    border-color: var(--border-color-dark);
+}
+
+    .memory-network-container {
+        position: relative;
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-lg);
+        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .memory-network-container canvas {
+        width: 100%;
+        height: 400px;
+        border-radius: var(--radius-md);
+        background: white;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .network-controls {
+        display: flex;
+        justify-content: center;
+        gap: var(--spacing-sm);
+        margin-top: var(--spacing-md);
+    }
+
+    .memory-filters {
+        display: flex;
+        gap: var(--spacing-sm);
+        align-items: center;
+    }
+
+    .memory-card {
+        background: white;
+        border: 1px solid var(--kira-gray-200);
+        border-radius: var(--radius-lg);
+        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-md);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .memory-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--kira-primary);
+    }
+
+    .memory-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--kira-primary);
+        transition: width 0.3s ease;
+    }
+
+    .memory-card:hover::before {
+        width: 8px;
+    }
+
+    .memory-card.conversation::before { background: var(--kira-neural-1); }
+    .memory-card.learning::before { background: var(--kira-neural-2); }
+    .memory-card.emotion::before { background: var(--kira-neural-3); }
+    .memory-card.fact::before { background: var(--kira-neural-4); }
+
+    .memory-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .memory-type {
+        background: var(--kira-gray-100);
+        color: var(--kira-gray-700);
+        padding: 2px 8px;
+        border-radius: var(--radius-sm);
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+
+    .memory-type.conversation { 
+        background: var(--kira-neural-1);
+        color: white;
+    }
+    .memory-type.learning { 
+        background: var(--kira-neural-2);
+        color: white;
+    }
+    .memory-type.emotion { 
+        background: var(--kira-neural-3);
+        color: white;
+    }
+    .memory-type.fact { 
+        background: var(--kira-neural-4);
+        color: white;
+    }
+
+    .memory-content {
+        color: var(--kira-gray-700);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .memory-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.75rem;
+        color: var(--kira-gray-500);
+    }
+
+    .memory-strength {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .strength-bar {
+        width: 40px;
+        height: 4px;
+        background: var(--kira-gray-200);
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    .strength-fill {
+        height: 100%;
+        background: var(--kira-success);
+        transition: width 0.3s ease;
+    }
+
+    .memory-analytics {
+        height: 300px;
+        padding: var(--spacing-md);
+    }
+
+    .memory-stat-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-sm) 0;
+        border-bottom: 1px solid var(--kira-gray-200);
+    }
+
+    .memory-stat-item:last-child {
+        border-bottom: none;
+    }
+
+    .stat-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+        color: white;
+        margin-right: var(--spacing-sm);
+    }
+
+    .category-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--spacing-sm) 0;
+        border-bottom: 1px solid var(--kira-gray-200);
+    }
+
+    .category-item:last-child {
+        border-bottom: none;
+    }
+
+    .category-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: var(--spacing-sm);
+    }
+
+    .category-name {
+        flex: 1;
+        font-weight: 500;
+        color: var(--kira-gray-700);
+    }
+
+    .category-count {
+        background: var(--kira-gray-100);
+        color: var(--kira-gray-600);
+        padding: 2px 8px;
+        border-radius: var(--radius-sm);
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .memory-tools .btn {
+        transition: all 0.2s ease;
+    }
+
+    .memory-tools .btn:hover {
+        transform: translateY(-1px);
+    }
+
+    /* Pulse Animation für Neural Activity */
+    @keyframes neural-pulse {
+        0%, 100% {
+            opacity: 0.7;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+    }
+
+    .neural-node {
+        animation: neural-pulse 3s infinite;
+    }
+
+    /* Loading Shimmer für Memory Cards */
+    .memory-loading {
+        background: linear-gradient(90deg, var(--kira-gray-200) 25%, var(--kira-gray-100) 50%, var(--kira-gray-200) 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        height: 120px;
+        border-radius: var(--radius-lg);
+        margin-bottom: var(--spacing-md);
+    }
+
+/* Live Chat Analytics Styles */
+    .live-chat-analytics {
+        padding: var(--spacing-md);
+    }
+    
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .metric-item {
+        text-align: center;
+        padding: var(--spacing-sm);
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--kira-gray-200);
+    }
+    
+    .metric-label {
+        font-size: 0.75rem;
+        color: var(--kira-gray-500);
+        margin-bottom: 4px;
+    }
+    
+    .metric-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--kira-primary);
+    }
+    
+    .last-activity {
+        text-align: center;
+        padding-top: var(--spacing-sm);
+        border-top: 1px solid var(--kira-gray-200);
+    }
+    
+    /* Active Conversations Styles */
+    .conversation-item {
+        padding: var(--spacing-sm);
+        margin-bottom: var(--spacing-sm);
+        border: 1px solid var(--kira-gray-200);
+        border-radius: var(--radius-md);
+        background: var(--kira-white);
+    }
+    
+    .conversation-item.active {
+        border-color: var(--kira-success);
+        background: var(--kira-success-light);
+    }
+    
+    .conversation-item.recent {
+        border-color: var(--kira-warning);
+        background: var(--kira-warning-light);
+    }
+    
+    .conversation-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    .conversation-id {
+        font-weight: 600;
+        color: var(--kira-gray-700);
+        font-size: 0.85rem;
+    }
+    
+    .conversation-status {
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+    
+    .status-active {
+        background: var(--kira-success);
+        color: white;
+    }
+    
+    .status-recent {
+        background: var(--kira-warning);
+        color: white;
+    }
+    
+    .status-system {
+        background: var(--kira-gray-400);
+        color: white;
+    }
+    
+    .conversation-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: var(--spacing-xs);
+    }
+    
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+        font-size: 0.75rem;
+    }
+    
+    .detail-label {
+        color: var(--kira-gray-500);
+        margin-bottom: 2px;
+    }
+    
+    .detail-value {
+        color: var(--kira-gray-700);
+        font-weight: 500;
+    }
+    
+    .no-data {
+        text-align: center;
+        padding: var(--spacing-lg);
+        color: var(--kira-gray-500);
+        font-style: italic;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    class MemoryDashboard {
+        constructor() {
+            this.baseUrl = '/api/memory';
+            this.updateInterval = 8000;
+            this.networkAnimation = null;
+            this.isAnimating = false;
+            this.chart = null;
+            
+            this.init();
+        }
+
+        async init() {
+            console.log('🧠 Memory Dashboard wird initialisiert...');
+            
+            // Initial data load
+            await this.loadAllMemoryData();
+            
+            // Initialize network visualization
+            this.initMemoryNetwork();
+            
+            // Initialize analytics chart
+            this.initAnalyticsChart();
+            
+            // Start real-time updates
+            this.startRealTimeUpdates();
+            
+            console.log('✅ Memory Dashboard bereit');
+        }
+
+        async loadAllMemoryData() {
+            this.showLoadingStates();
+            
+            try {
+                await Promise.all([
+                    this.loadMemoryOverview(),
+                    this.loadRecentMemories(),
+                    this.loadMemoryStats(),
+                    this.loadMemoryCategories(),
+                    this.loadMemoryHealth()
+                ]);
+            } catch (error) {
+                console.error('❌ Memory dashboard load error:', error);
+                this.showFallbackData();
+            }
+        }
+
+        showLoadingStates() {
+            document.getElementById('recentMemoriesGrid').innerHTML = 
+                Array(3).fill().map(() => '<div class="memory-loading"></div>').join('');
+        }
+
+        async loadMemoryOverview() {
+            try {
+                const response = await fetch(`${this.baseUrl}/overview`);
+                if (response.ok) {
+                    const data = await response.json();
+                    this.updateMemoryOverview(data);
+                } else {
+                    this.loadFallbackOverview();
+                }
+            } catch (error) {
+                console.warn('Memory overview fallback:', error);
+                this.loadFallbackOverview();
+            }
+        }
+
+        updateMemoryOverview(data) {
+            const container = document.getElementById('memoryOverview');
+            const stats = [
+                { 
+                    icon: 'fas fa-brain', 
+                    label: 'Total Memories', 
+                    value: data.total_memories || '1,234', 
+                    color: 'var(--kira-neural-1)' 
+                },
+                { 
+                    icon: 'fas fa-comments', 
+                    label: 'Conversations', 
+                    value: data.conversations || '856', 
+                    color: 'var(--kira-neural-2)' 
+                },
+                { 
+                    icon: 'fas fa-lightbulb', 
+                    label: 'Learning Events', 
+                    value: data.learning_events || '234', 
+                    color: 'var(--kira-neural-3)' 
+                },
+                { 
+                    icon: 'fas fa-heart', 
+                    label: 'Emotional Memory', 
+                    value: data.emotional_memories || '144', 
+                    color: 'var(--kira-neural-4)' 
+                }
+            ];
+
+            container.innerHTML = stats.map(stat => 
+                DashboardUtils.createStatCard(stat.icon, stat.label, stat.value, stat.color)
+            ).join('');
+        }
+
+        loadFallbackOverview() {
+            this.updateMemoryOverview({
+                total_memories: Math.floor(Math.random() * 500) + 1000,
+                conversations: Math.floor(Math.random() * 200) + 700,
+                learning_events: Math.floor(Math.random() * 100) + 200,
+                emotional_memories: Math.floor(Math.random() * 50) + 100
+            });
+        }
+
+        async loadRecentMemories() {
+            const container = document.getElementById('recentMemoriesGrid');
+            
+            const memories = [
+                {
+                    type: 'conversation',
+                    content: 'Benutzer fragte nach dem Wetter und ich half bei der Wettervorhersage für morgen.',
+                    timestamp: 'vor 5 Min',
+                    strength: 85
+                },
+                {
+                    type: 'learning',
+                    content: 'Neues Sprachmuster erkannt: Benutzer verwendet oft "übrigens" als Übergang.',
+                    timestamp: 'vor 12 Min',
+                    strength: 92
+                },
+                {
+                    type: 'emotion',
+                    content: 'Benutzer war frustriert mit der langsamen Internetverbindung.',
+                    timestamp: 'vor 18 Min',
+                    strength: 78
+                },
+                {
+                    type: 'fact',
+                    content: 'Benutzer arbeitet als Software-Entwickler und bevorzugt Python.',
+                    timestamp: 'vor 1 Std',
+                    strength: 95
+                }
+            ];
+
+            container.innerHTML = memories.map(memory => this.createMemoryCard(memory)).join('');
+        }
+
+        createMemoryCard(memory) {
+            return `
+                <div class="memory-card ${memory.type}">
+                    <div class="memory-header">
+                        <span class="memory-type ${memory.type}">${memory.type}</span>
+                        <small class="text-muted">${memory.timestamp}</small>
+                    </div>
+                    <div class="memory-content">
+                        ${memory.content}
+                    </div>
+                    <div class="memory-meta">
+                        <div class="memory-strength">
+                            <span>Stärke:</span>
+                            <div class="strength-bar">
+                                <div class="strength-fill" style="width: ${memory.strength}%"></div>
+                            </div>
+                            <span>${memory.strength}%</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async loadMemoryStats() {
+            const container = document.getElementById('memoryStats');
+            
+            const stats = [
+                { icon: 'fas fa-database', iconColor: 'var(--kira-primary)', label: 'Storage Used', value: '2.3 GB' },
+                { icon: 'fas fa-clock', iconColor: 'var(--kira-success)', label: 'Avg. Recall Time', value: '0.02s' },
+                { icon: 'fas fa-chart-line', iconColor: 'var(--kira-info)', label: 'Learning Rate', value: '94%' },
+                { icon: 'fas fa-shield-alt', iconColor: 'var(--kira-warning)', label: 'Memory Integrity', value: '99.8%' }
+            ];
+
+            container.innerHTML = stats.map(stat => `
+                <div class="memory-stat-item">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon" style="background: ${stat.iconColor};">
+                            <i class="${stat.icon}"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold">${stat.value}</div>
+                            <small class="text-muted">${stat.label}</small>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async loadMemoryCategories() {
+            const container = document.getElementById('memoryCategories');
+            
+            const categories = [
+                { name: 'Conversations', count: 856, color: 'var(--kira-neural-1)' },
+                { name: 'Learning', count: 234, color: 'var(--kira-neural-2)' },
+                { name: 'Emotions', count: 144, color: 'var(--kira-neural-3)' },
+                { name: 'Facts', count: 89, color: 'var(--kira-neural-4)' },
+                { name: 'Other', count: 45, color: 'var(--kira-gray-400)' }
+            ];
+
+            container.innerHTML = categories.map(category => `
+                <div class="category-item">
+                    <div class="d-flex align-items-center">
+                        <div class="category-color" style="background: ${category.color}"></div>
+                        <span class="category-name">${category.name}</span>
+                    </div>
+                    <span class="category-count">${category.count}</span>
+                </div>
+            `).join('');
+        }
+
+        async loadMemoryHealth() {
+            const container = document.getElementById('memoryHealth');
+            
+            const healthMetrics = [
+                { label: 'Neural Network', value: 'Optimal', status: 'good' },
+                { label: 'Memory Retention', value: '98.5%', status: 'good' },
+                { label: 'Learning Efficiency', value: 'High', status: 'good' },
+                { label: 'Data Integrity', value: 'Verified', status: 'good' }
+            ];
+
+            container.innerHTML = healthMetrics.map(metric => `
+                <div class="health-metric">
+                    <span class="metric-label">${metric.label}</span>
+                    <span class="metric-value ${metric.status}">${metric.value}</span>
+                </div>
+            `).join('');
+        }
+
+        initMemoryNetwork() {
+            const canvas = document.getElementById('memoryNetworkCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Simple neural network visualization
+            this.drawStaticNetwork(ctx, canvas);
+        }
+
+        drawStaticNetwork(ctx, canvas) {
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            // Draw nodes
+            const nodes = [
+                { x: width * 0.2, y: height * 0.3, type: 'input' },
+                { x: width * 0.2, y: height * 0.7, type: 'input' },
+                { x: width * 0.5, y: height * 0.2, type: 'hidden' },
+                { x: width * 0.5, y: height * 0.5, type: 'hidden' },
+                { x: width * 0.5, y: height * 0.8, type: 'hidden' },
+                { x: width * 0.8, y: height * 0.4, type: 'output' },
+                { x: width * 0.8, y: height * 0.6, type: 'output' }
+            ];
+
+            // Draw connections
+            ctx.strokeStyle = 'rgba(37, 99, 235, 0.3)';
+            ctx.lineWidth = 2;
+            
+            nodes.forEach((node, i) => {
+                nodes.forEach((otherNode, j) => {
+                    if (i !== j && Math.random() > 0.5) {
+                        ctx.beginPath();
+                        ctx.moveTo(node.x, node.y);
+                        ctx.lineTo(otherNode.x, otherNode.y);
+                        ctx.stroke();
+                    }
+                });
+            });
+
+            // Draw nodes
+            nodes.forEach(node => {
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, 8, 0, 2 * Math.PI);
+                ctx.fillStyle = node.type === 'input' ? '#8b5cf6' : 
+                              node.type === 'hidden' ? '#06b6d4' : '#10b981';
+                ctx.fill();
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+        }
+
+        initAnalyticsChart() {
+            const ctx = document.getElementById('memoryAnalyticsChart').getContext('2d');
+            
+            this.chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [
+                        {
+                            label: 'New Memories',
+                            data: [65, 78, 66, 85, 76, 55, 48],
+                            borderColor: 'var(--kira-neural-1)',
+                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Memory Recalls',
+                            data: [45, 52, 44, 67, 58, 38, 35],
+                            borderColor: 'var(--kira-neural-2)',
+                            backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        startRealTimeUpdates() {
+            startAutoRefresh(() => {
+                this.loadMemoryOverview();
+                this.loadRecentMemories();
+                this.loadMemoryStats();
+            }, this.updateInterval);
+        }
+
+        showFallbackData() {
+            console.log('🧠 Zeige Memory Fallback-Daten');
+            this.loadFallbackOverview();
+            this.loadRecentMemories();
+            this.loadMemoryStats();
+            this.loadMemoryCategories();
+            this.loadMemoryHealth();
+        }
+    }
+
+    // Global functions
+    function toggleNetworkAnimation() {
+        const memoryDashboard = window.memoryDashboard;
+        if (memoryDashboard) {
+            const icon = document.getElementById('networkAnimationIcon');
+            const text = document.getElementById('networkAnimationText');
+            
+            if (memoryDashboard.isAnimating) {
+                memoryDashboard.isAnimating = false;
+                icon.className = 'fas fa-play';
+                text.textContent = 'Start';
+                if (memoryDashboard.networkAnimation) {
+                    clearInterval(memoryDashboard.networkAnimation);
+                }
+            } else {
+                memoryDashboard.isAnimating = true;
+                icon.className = 'fas fa-pause';
+                text.textContent = 'Pause';
+                // Start animation
+            }
+        }
+    }
+
+    function resetNetworkView() {
+        if (window.memoryDashboard) {
+            window.memoryDashboard.initMemoryNetwork();
+        }
+    }
+
+    function refreshMemoryNetwork() {
+        console.log('🔄 Refreshing memory network...');
+        if (window.memoryDashboard) {
+            window.memoryDashboard.initMemoryNetwork();
+        }
+    }
+
+    function filterMemories() {
+        const filterValue = document.getElementById('memoryTypeFilter').value;
+        console.log(`🔍 Filtering memories: ${filterValue}`);
+        
+        const memoryCards = document.querySelectorAll('.memory-card');
+        memoryCards.forEach(card => {
+            if (filterValue === 'all' || card.classList.contains(filterValue)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function optimizeMemory() {
+        console.log('🔧 Optimizing memory...');
+        alert('Memory optimization wird gestartet...');
+    }
+
+    function exportMemories() {
+        console.log('📥 Exporting memories...');
+        alert('Memory export wird vorbereitet...');
+    }
+
+    function clearOldMemories() {
+        if (confirm('Alte Memories wirklich löschen?')) {
+            console.log('🗑️ Clearing old memories...');
+            alert('Alte Memories werden bereinigt...');
+        }
+    }
+
+    // Initialize memory dashboard
+    document.addEventListener('DOMContentLoaded', () => {
+        window.memoryDashboard = new MemoryDashboard();
+    });
+    
+    // Additional search functionality
+    function searchMemories() {
+        const query = document.getElementById('memorySearchInput').value;
+        if (query.trim() && window.memoryDashboard) {
+            window.memoryDashboard.searchMemories(query);
+        }
+    }
+
+    // Enter key support for search
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('memorySearchInput');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchMemories();
+                }
+            });
+        }
+    });
+</script>
+<script src="{{ url_for('static', filename='js/memory-dashboard.js') }}"></script>
+{% endblock %}

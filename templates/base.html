@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Kira Home System{% endblock %}</title>
+    
+    <!-- Modern CSS Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Kira Dark Mode CSS -->
+    <link href="{{ url_for('static', filename='css/dark-mode.css') }}" rel="stylesheet">
+    
+    <!-- Chart.js and jQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="{{ url_for('static', filename='js/dark-mode.js') }}"></script>
+    
+    <!-- Kira JavaScript Files -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/components.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chat-widget.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+    
+    <!-- Modern Kira UI Styles -->
+    <style>
+        :root {
+            /* Modern Color Palette */
+            --kira-primary: #2563eb;
+            --kira-primary-dark: #1d4ed8;
+            --kira-secondary: #7c3aed;
+            --kira-accent: #06b6d4;
+            --kira-success: #10b981;
+            --kira-warning: #f59e0b;
+            --kira-danger: #ef4444;
+            --kira-info: #3b82f6;
+            
+            /* Neural Network Colors */
+            --kira-neural-1: #8b5cf6;
+            --kira-neural-2: #06b6d4;
+            --kira-neural-3: #10b981;
+            --kira-neural-4: #f59e0b;
+            
+            /* Modern Grays */
+            --kira-gray-50: #f8fafc;
+            --kira-gray-100: #f1f5f9;
+            --kira-gray-200: #e2e8f0;
+            --kira-gray-300: #cbd5e1;
+            --kira-gray-400: #94a3b8;
+            --kira-gray-500: #64748b;
+            --kira-gray-600: #475569;
+            --kira-gray-700: #334155;
+            --kira-gray-800: #1e293b;
+            --kira-gray-900: #0f172a;
+            
+            /* Chat Colors */
+            --kira-chat-primary: #00d2d3;
+            --kira-chat-secondary: #54a0ff;
+            --kira-chat-gradient: linear-gradient(135deg, var(--kira-chat-primary), var(--kira-chat-secondary));
+            
+            /* Glass Effect */
+            --glass-bg: rgba(255, 255, 255, 0.25);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            
+            /* Spacing */
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Modern Typography */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-weight: 400;
+            line-height: 1.6;
+            color: var(--kira-gray-700);
+            background: linear-gradient(135deg, var(--kira-gray-50) 0%, #e0e7ff 50%, var(--kira-gray-100) 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--kira-gray-100);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--kira-gray-300);
+            border-radius: var(--radius-lg);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--kira-gray-400);
+        }
+
+        /* Modern Navigation */
+        .kira-navbar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--kira-primary) !important;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .kira-logo {
+            width: 32px;
+            height: 32px;
+            background: var(--kira-chat-gradient);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .nav-link {
+            color: var(--kira-gray-600) !important;
+            font-weight: 500;
+            padding: var(--spacing-sm) var(--spacing-md) !important;
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+            margin: 0 var(--spacing-xs);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: var(--kira-primary);
+            color: white !important;
+            transform: translateY(-1px);
+        }
+
+        /* Modern Sidebar */
+        .kira-sidebar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            height: calc(100vh - 76px);
+            position: sticky;
+            top: 76px;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-nav {
+            padding: var(--spacing-lg);
+        }
+
+        .sidebar-nav .nav-link {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-xs);
+            border-radius: var(--radius-lg);
+            color: var(--kira-gray-600);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-nav .nav-link:hover {
+            background: var(--kira-gray-100);
+            color: var(--kira-primary);
+            transform: translateX(4px);
+        }
+
+        .sidebar-nav .nav-link.active {
+            background: var(--kira-primary);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Modern Cards */
+        .kira-card {
+            background: white;
+            border: 1px solid var(--kira-gray-200);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .kira-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--kira-primary);
+        }
+
+        .kira-card-header {
+            background: var(--kira-gray-50);
+            border-bottom: 1px solid var(--kira-gray-200);
+            padding: var(--spacing-lg);
+            font-weight: 600;
+            color: var(--kira-gray-800);
+        }
+
+        .kira-card-body {
+            padding: var(--spacing-lg);
+        }
+
+        /* Modern Buttons */
+        .btn-kira {
+            background: var(--kira-chat-gradient);
+            border: none;
+            color: white;
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .btn-kira:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: white;
+        }
+
+        .btn-kira:active {
+            transform: translateY(0);
+        }
+
+        .btn-outline-kira {
+            border: 2px solid var(--kira-primary);
+            color: var(--kira-primary);
+            background: transparent;
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-kira:hover {
+            background: var(--kira-primary);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* Status Indicators */
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: var(--spacing-sm);
+            position: relative;
+        }
+
+        .status-indicator::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: pulse-ring 2s infinite;
+        }
+
+        .status-online { 
+            background-color: var(--kira-success); 
+        }
+        .status-online::after { 
+            background-color: var(--kira-success); 
+        }
+
+        .status-warning { 
+            background-color: var(--kira-warning); 
+        }
+        .status-warning::after { 
+            background-color: var(--kira-warning); 
+        }
+
+        .status-error { 
+            background-color: var(--kira-danger); 
+        }
+        .status-error::after { 
+            background-color: var(--kira-danger); 
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        /* ===== MODERN KIRA CHAT WIDGET ===== */
+        .kira-chat-widget {
+            position: fixed;
+            bottom: var(--spacing-lg);
+            right: var(--spacing-lg);
+            z-index: 1050;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .kira-chat-toggle {
+            width: 64px;
+            height: 64px;
+            background: var(--kira-chat-gradient);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            box-shadow: var(--shadow-xl);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kira-chat-toggle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .kira-chat-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .kira-chat-toggle:hover::before {
+            left: 100%;
+        }
+
+        .kira-chat-toggle.active {
+            transform: scale(0.9);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+        }
+
+        .chat-notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--kira-danger);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: bounce-notification 2s infinite;
+            border: 2px solid white;
+        }
+
+        @keyframes bounce-notification {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-8px);
+            }
+            60% {
+                transform: translateY(-4px);
+            }
+        }
+
+        .kira-chat-window {
+            width: 380px;
+            height: 520px;
+            background: white;
+            border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+            box-shadow: var(--shadow-2xl);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid var(--kira-gray-200);
+            margin-top: var(--spacing-sm);
+        }
+
+        .kira-chat-window.show {
+            display: flex;
+            animation: slideUpChat 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUpChat {
+            from {
+                transform: translateY(100%) scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .kira-chat-header {
+            background: var(--kira-chat-gradient);
+            color: white;
+            padding: var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .kira-avatar-container {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .kira-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            animation: glow-pulse 3s infinite;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(255,255,255,0.3);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(255,255,255,0.6);
+            }
+        }
+
+        .kira-info h6 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .kira-status {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .chat-controls {
+            display: flex;
+            gap: var(--spacing-xs);
+        }
+
+        .chat-control-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .kira-chat-messages {
+            flex: 1;
+            padding: var(--spacing-lg);
+            overflow-y: auto;
+            background: var(--kira-gray-50);
+            max-height: 350px;
+            position: relative;
+        }
+
+        .chat-message {
+            margin-bottom: var(--spacing-lg);
+            animation: fadeInMessage 0.4s ease;
+        }
+
+        @keyframes fadeInMessage {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-message.user {
+            text-align: right;
+        }
+
+        .chat-message.kira {
+            text-align: left;
+        }
+
+        .message-bubble {
+            display: inline-block;
+            max-width: 85%;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--radius-xl);
+            word-wrap: break-word;
+            position: relative;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .chat-message.user .message-bubble {
+            background: var(--kira-chat-gradient);
+            color: white;
+            border-bottom-right-radius: var(--radius-sm);
+        }
+
+        .chat-message.kira .message-bubble {
+            background: white;
+            color: var(--kira-gray-700);
+            border: 1px solid var(--kira-gray-200);
+            border-bottom-left-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: var(--spacing-xs);
+        }
+
+        .kira-typing {
+            display: none;
+            text-align: left;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .typing-bubble {
+            background: white;
+            border: 1px solid var(--kira-gray-200);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--radius-xl);
+            border-bottom-left-radius: var(--radius-sm);
+            display: inline-block;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--kira-chat-primary);
+            border-radius: 50%;
+            animation: typing-bounce 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing-bounce {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-12px);
+                opacity: 1;
+            }
+        }
+
+        .kira-chat-input {
+            padding: var(--spacing-lg);
+            background: white;
+            border-top: 1px solid var(--kira-gray-200);
+        }
+
+        .chat-input-group {
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: flex-end;
+        }
+
+        .chat-input-field {
+            flex: 1;
+            border: 2px solid var(--kira-gray-200);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-md) var(--spacing-lg);
+            outline: none;
+            transition: all 0.3s ease;
+            resize: none;
+            max-height: 100px;
+            min-height: 44px;
+            font-family: inherit;
+        }
+
+        .chat-input-field:focus {
+            border-color: var(--kira-chat-primary);
+            box-shadow: 0 0 0 3px rgba(0, 210, 211, 0.1);
+        }
+
+        .chat-send-btn {
+            background: var(--kira-chat-gradient);
+            border: none;
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .chat-send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Modern Footer */
+        .kira-footer {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            padding: var(--spacing-xl) 0;
+            margin-top: var(--spacing-2xl);
+            color: var(--kira-gray-600);
+        }
+
+        /* Modern Utilities */
+        .text-kira-primary { color: var(--kira-primary) !important; }
+        .text-kira-secondary { color: var(--kira-secondary) !important; }
+        .bg-kira-primary { background-color: var(--kira-primary) !important; }
+        .bg-kira-secondary { background-color: var(--kira-secondary) !important; }
+
+        .glass-effect {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Activity Pulse */
+        .activity-pulse {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--kira-success);
+            border-radius: 50%;
+            animation: pulse-dot 1.5s infinite;
+            margin-right: var(--spacing-sm);
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .kira-chat-widget {
+                bottom: var(--spacing-md);
+                right: var(--spacing-md);
+            }
+
+            .kira-chat-window {
+                width: calc(100vw - 2rem);
+                height: calc(100vh - 8rem);
+                border-radius: var(--radius-xl);
+                margin: 0;
+            }
+
+            .kira-sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                width: 280px;
+                z-index: 1040;
+            }
+
+            .kira-sidebar.show {
+                transform: translateX(0);
+            }
+        }
+
+        /* Loading States */
+        .loading-shimmer {
+            background: linear-gradient(90deg, var(--kira-gray-200) 25%, var(--kira-gray-100) 50%, var(--kira-gray-200) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body>
+    <!-- Modern Navigation -->
+    <nav class="navbar navbar-expand-lg kira-navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <div class="kira-logo">
+                    <i class="fas fa-brain"></i>
+                </div>
+                Kira Home System
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/memory">
+                            <i class="fas fa-brain me-1"></i>Memory
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/health">
+                            <i class="fas fa-heartbeat me-1"></i>Health
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/settings">
+                            <i class="fas fa-cog me-1"></i>Settings
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center gap-3">
+                    <span class="status-indicator status-online"></span>
+                    <span class="text-sm">System Online</span>
+                    
+                    <!-- Dark Mode Toggle -->
+                    <button id="darkModeToggle" class="btn btn-outline-kira btn-sm" onclick="toggleDarkMode()" title="Switch to Dark Mode">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    
+                    <button class="btn btn-outline-kira btn-sm">
+                        <i class="fas fa-user-circle me-1"></i>Profile
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar (Optional - can be hidden on some pages) -->
+            {% if show_sidebar %}
+            <div class="col-md-3 col-lg-2 p-0">
+                <div class="kira-sidebar">
+                    <nav class="sidebar-nav">
+                        <a href="/" class="nav-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="/memory" class="nav-link">
+                            <i class="fas fa-brain"></i>
+                            <span>Memory System</span>
+                        </a>
+                        <a href="/chat" class="nav-link">
+                            <i class="fas fa-comments"></i>
+                            <span>Chat History</span>
+                        </a>
+                        <a href="/health" class="nav-link">
+                            <i class="fas fa-heartbeat"></i>
+                            <span>Health Monitor</span>
+                        </a>
+                        <a href="/storage" class="nav-link">
+                            <i class="fas fa-database"></i>
+                            <span>Storage</span>
+                        </a>
+                        <a href="/todo" class="nav-link">
+                            <i class="fas fa-tasks"></i>
+                            <span>Tasks</span>
+                        </a>
+                        <a href="/config" class="nav-link">
+                            <i class="fas fa-cogs"></i>
+                            <span>Configuration</span>
+                        </a>
+                        <a href="/system" class="nav-link">
+                            <i class="fas fa-server"></i>
+                            <span>System Info</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Main Content -->
+            <div class="{% if show_sidebar %}col-md-9 col-lg-10{% else %}col-12{% endif %}">
+                <main class="p-4">
+                    {% block content %}
+                    <!-- Page content goes here -->
+                    {% endblock %}
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modern Kira Chat Widget -->
+    <div class="kira-chat-widget" id="kiraChatWidget">
+        <!-- Chat Toggle Button -->
+        <button class="kira-chat-toggle" id="kiraChatToggle" onclick="toggleKiraChat()">
+            <i class="fas fa-comments" id="chatToggleIcon"></i>
+            <div class="chat-notification-badge" id="chatNotificationBadge" style="display: none;">
+                3
+            </div>
+        </button>
+
+        <!-- Chat Window -->
+        <div class="kira-chat-window" id="kiraChatWindow">
+            <!-- Chat Header -->
+            <div class="kira-chat-header">
+                <div class="kira-avatar-container">
+                    <div class="kira-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="kira-info">
+                        <h6>Kira AI Assistant</h6>
+                        <div class="kira-status">
+                            <span class="activity-pulse"></span>
+                            <span id="kiraStatusText">Online & Ready</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-controls">
+                    <button class="chat-control-btn" onclick="minimizeKiraChat()" title="Minimize">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button class="chat-control-btn" onclick="closeKiraChat()" title="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div class="kira-chat-messages" id="kiraChatMessages">
+                <!-- Welcome Message -->
+                <div class="chat-message kira">
+                    <div class="message-bubble">
+                        <p>👋 Hallo! Ich bin Kira, dein intelligenter AI-Assistent. Wie kann ich dir heute helfen?</p>
+                    </div>
+                    <div class="message-time">Jetzt</div>
+                </div>
+            </div>
+
+            <!-- Typing Indicator -->
+            <div class="kira-typing" id="kiraTyping">
+                <div class="typing-bubble">
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="kira-chat-input">
+                <div class="chat-input-group">
+                    <textarea 
+                        class="chat-input-field" 
+                        id="kiraChatInput"
+                        placeholder="Schreibe eine Nachricht an Kira..."
+                        rows="1"
+                        onkeypress="handleChatKeyPress(event)"
+                    ></textarea>
+                    <button class="chat-send-btn" id="chatSendBtn" onclick="sendKiraMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modern Footer -->
+    <footer class="kira-footer">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="kira-logo">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">Kira Home System</h6>
+                            <small>Intelligent AI Assistant Platform</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="d-flex justify-content-end align-items-center gap-3">
+                        <span class="activity-pulse"></span>
+                        <small>System Status: Online</small>
+                        <small>Version 2.0.0</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modern JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Dashboard Utility Functions -->
+    <script>
+        const DashboardUtils = {
+            createStatCard: function(icon, label, value, color) {
+                return `
+                    <div class="stat-card" style="--stat-color: ${color}">
+                        <div class="stat-icon">
+                            <i class="${icon}"></i>
+                        </div>
+                        <div class="stat-value">${value}</div>
+                        <div class="stat-label">${label}</div>
+                    </div>
+                `;
+            },
+
+            updateTimestamp: function(elementId) {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    const now = new Date();
+                    const timeString = now.toLocaleTimeString('de-DE');
+                    element.textContent = `Letzte Aktualisierung: ${timeString}`;
+                }
+            },
+
+            formatBytes: function(bytes) {
+                if (bytes === 0) return '0 B';
+                const k = 1024;
+                const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            },
+
+            formatUptime: function(seconds) {
+                const days = Math.floor(seconds / 86400);
+                const hours = Math.floor((seconds % 86400) / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                
+                if (days > 0) return `${days}d ${hours}h`;
+                if (hours > 0) return `${hours}h ${minutes}m`;
+                return `${minutes}m`;
+            }
+        };
+
+        // Auto-refresh functionality
+        function startAutoRefresh(callback, interval = 30000) {
+            if (typeof callback === 'function') {
+                setInterval(callback, interval);
+            }
+        }
+
+        // Globale Funktionen für HTML onclick events
+        let kiraChat = null;
+
+        function toggleKiraChat() {
+            if (!kiraChat) {
+                kiraChat = new KiraChatWidget();
+            }
+            kiraChat.toggle();
+        }
+
+        function minimizeKiraChat() {
+            if (kiraChat) kiraChat.minimize();
+        }
+
+        function closeKiraChat() {
+            if (kiraChat) kiraChat.close();
+        }
+
+        function sendKiraMessage() {
+            if (kiraChat) {
+                const input = document.getElementById('kiraChatInput');
+                const message = input.value.trim();
+                if (message) {
+                    kiraChat.sendMessage(message);
+                }
+            }
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendKiraMessage();
+            }
+        }
+
+        // Auto-initialize wenn DOM geladen
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🤖 Kira Chat Widget bereit');
+        });
+
+        // Bestehende Funktionen (Brain Waves etc.)
+        function toggleBrainWaves() {
+            const widget = document.getElementById('brainWaveWidget');
+            if (widget) {
+                widget.style.display = widget.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        function pauseBrainWaves() {
+            console.log('Brain waves paused/resumed');
+        }
+
+        function checkSystemHealth() {
+            console.log('Checking system health...');
+        }
+
+        function checkMemoryHealth() {
+            console.log('Checking memory health...');
+        }
+
+        function viewLogs() {
+            console.log('Opening logs...');
+        }
+
+        function restartSystem() {
+            if (confirm('System wirklich neustarten?')) {
+                console.log('Restarting system...');
+            }
+        }
+    </script>
+</body>
+</html>

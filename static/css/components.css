@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Kira Chat Dashboard{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="text-kira-primary">Chat Dashboard</h1>
+    <div class="kira-chat-widget" id="kiraChatWidget">
+        <!-- Chat Toggle Button -->
+        <button class="kira-chat-toggle" id="kiraChatToggle" onclick="toggleKiraChat()">
+            <i class="fas fa-comments"></i>
+        </button>
+        <!-- Chat Window -->
+        <div class="kira-chat-window" id="kiraChatWindow">
+            <!-- Chat Header -->
+            <div class="kira-chat-header">
+                <h6>Kira AI Assistant</h6>
+            </div>
+            <!-- Chat Messages -->
+            <div class="kira-chat-messages" id="kiraChatMessages"></div>
+            <!-- Chat Input -->
+            <div class="kira-chat-input">
+                <textarea class="chat-input-field" id="kiraChatInput" placeholder="Type a message..."></textarea>
+                <button class="chat-send-btn" id="chatSendBtn" onclick="sendKiraMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

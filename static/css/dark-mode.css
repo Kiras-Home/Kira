@@ -1,0 +1,262 @@
+/* ===== KIRA DARK MODE SYSTEM ===== */
+
+/* Dark Mode Color Overrides */
+body.dark-mode {
+    /* Dark Background & Text */
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%) !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode :root {
+    /* Dark Mode Color Palette */
+    --kira-primary: #3b82f6;
+    --kira-primary-dark: #2563eb;
+    --kira-secondary: #8b5cf6;
+    --kira-accent: #06b6d4;
+    --kira-success: #10b981;
+    --kira-warning: #f59e0b;
+    --kira-danger: #ef4444;
+    --kira-info: #3b82f6;
+    
+    /* Dark Grays */
+    --kira-gray-50: #1e293b;
+    --kira-gray-100: #334155;
+    --kira-gray-200: #475569;
+    --kira-gray-300: #64748b;
+    --kira-gray-400: #94a3b8;
+    --kira-gray-500: #cbd5e1;
+    --kira-gray-600: #e2e8f0;
+    --kira-gray-700: #f1f5f9;
+    --kira-gray-800: #f8fafc;
+    --kira-gray-900: #ffffff;
+    
+    /* Dark Glass Effect */
+    --glass-bg: rgba(30, 41, 59, 0.4);
+    --glass-border: rgba(100, 116, 139, 0.3);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Navigation Dark Mode */
+body.dark-mode .kira-navbar {
+    background: rgba(30, 41, 59, 0.9) !important;
+    border-bottom: 1px solid rgba(100, 116, 139, 0.3) !important;
+}
+
+body.dark-mode .navbar-brand {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .nav-link {
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .nav-link:hover,
+body.dark-mode .nav-link.active {
+    background: var(--kira-primary) !important;
+    color: white !important;
+}
+
+/* Cards & Panels Dark Mode */
+body.dark-mode .kira-card,
+body.dark-mode .panel-card {
+    background: rgba(30, 41, 59, 0.8) !important;
+    border: 1px solid rgba(100, 116, 139, 0.3) !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .kira-card-header,
+body.dark-mode .panel-header {
+    background: rgba(51, 65, 85, 0.8) !important;
+    border-bottom: 1px solid rgba(100, 116, 139, 0.3) !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .panel-title {
+    color: #f1f5f9 !important;
+}
+
+/* Dashboard Dark Mode */
+body.dark-mode .dashboard-header {
+    background: rgba(30, 41, 59, 0.9) !important;
+    border-bottom: 1px solid rgba(100, 116, 139, 0.3) !important;
+}
+
+body.dark-mode .dashboard-title {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .dashboard-description {
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .dashboard-icon {
+    background: var(--kira-primary) !important;
+}
+
+/* Stats Cards Dark Mode */
+body.dark-mode .stat-card {
+    background: rgba(30, 41, 59, 0.8) !important;
+    border: 1px solid rgba(100, 116, 139, 0.3) !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .stat-value {
+    color: #f8fafc !important;
+}
+
+body.dark-mode .stat-label {
+    color: #cbd5e1 !important;
+}
+
+/* Action Cards Dark Mode */
+body.dark-mode .action-card {
+    background: rgba(30, 41, 59, 0.8) !important;
+    border: 2px solid rgba(100, 116, 139, 0.3) !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .action-card:hover {
+    background: rgba(51, 65, 85, 0.9) !important;
+    border-color: var(--kira-primary) !important;
+}
+
+body.dark-mode .action-card h5 {
+    color: #f8fafc !important;
+}
+
+body.dark-mode .action-card p {
+    color: #cbd5e1 !important;
+}
+
+/* Forms & Inputs Dark Mode */
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background: rgba(30, 41, 59, 0.8) !important;
+    border: 1px solid rgba(100, 116, 139, 0.5) !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .form-control:focus,
+body.dark-mode .form-select:focus {
+    background: rgba(51, 65, 85, 0.8) !important;
+    border-color: var(--kira-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25) !important;
+    color: #f1f5f9 !important;
+}
+
+/* Buttons Dark Mode */
+body.dark-mode .refresh-btn {
+    background: rgba(51, 65, 85, 0.8) !important;
+    border: 1px solid rgba(100, 116, 139, 0.5) !important;
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .refresh-btn:hover {
+    background: var(--kira-primary) !important;
+    border-color: var(--kira-primary) !important;
+    color: white !important;
+}
+
+/* Chat Widget Dark Mode */
+body.dark-mode .kira-chat-window {
+    background: rgba(30, 41, 59, 0.95) !important;
+    border: 1px solid rgba(100, 116, 139, 0.5) !important;
+}
+
+body.dark-mode .kira-chat-messages {
+    background: rgba(15, 23, 42, 0.8) !important;
+}
+
+body.dark-mode .chat-message.kira .message-bubble {
+    background: rgba(51, 65, 85, 0.8) !important;
+    border: 1px solid rgba(100, 116, 139, 0.3) !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .chat-input-field {
+    background: rgba(51, 65, 85, 0.8) !important;
+    border: 1px solid rgba(100, 116, 139, 0.5) !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .chat-input-field:focus {
+    border-color: var(--kira-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25) !important;
+}
+
+/* Badges & Indicators Dark Mode */
+body.dark-mode .badge {
+    background: var(--kira-primary) !important;
+}
+
+body.dark-mode .health-metric,
+body.dark-mode .breakdown-item,
+body.dark-mode .module-item,
+body.dark-mode .activity-item {
+    background: rgba(51, 65, 85, 0.6) !important;
+    color: #f1f5f9 !important;
+}
+
+/* Scrollbar Dark Mode */
+body.dark-mode ::-webkit-scrollbar-track {
+    background: rgba(30, 41, 59, 0.8) !important;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, 0.6) !important;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.8) !important;
+}
+
+/* Smooth Transitions */
+body,
+.kira-navbar,
+.kira-card,
+.panel-card,
+.stat-card,
+.action-card,
+.form-control,
+.refresh-btn {
+    transition: all 0.3s ease !important;
+}
+
+/* Dark Mode Toggle Button */
+.dark-mode-toggle {
+    position: relative;
+    overflow: hidden;
+}
+
+.dark-mode-toggle i {
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .dark-mode-toggle i {
+    transform: rotate(180deg);
+}
+
+/* Smooth theme transition for better UX */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+}
+
+/* Typing message animation */
+.typing-message .typing-content {
+    background: rgba(100, 116, 139, 0.2) !important;
+    border: 1px solid rgba(100, 116, 139, 0.3) !important;
+    color: #cbd5e1 !important;
+    font-style: italic;
+    animation: typing-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes typing-pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+body.dark-mode .typing-message .typing-content {
+    background: rgba(51, 65, 85, 0.6) !important;
+    border: 1px solid rgba(100, 116, 139, 0.4) !important;
+    color: #94a3b8 !important;
+}

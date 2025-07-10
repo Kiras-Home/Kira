@@ -1,0 +1,112 @@
+api:
+  api_key_required: false
+  debug: true
+  enable_cors: true
+  enable_swagger: true
+  enable_websockets: true
+  host: 0.0.0.0
+  port: 5001
+  request_logging: true
+database:
+  backup_enabled: true
+  backup_interval: 86400
+  connection_pool_size: 5
+  database_type: sqlite
+  database_url: sqlite:///data/kira.db
+  enable_migrations: true
+  retention_days: 30
+emotion:
+  emotion_confidence_threshold: 0.3
+  emotion_history_limit: 100
+  enable_emotion_analysis: true
+  enable_emotional_voice: true
+  enable_personality_profiling: true
+  enable_response_personalization: true
+  personality_learning_rate: 0.3
+  personality_update_frequency: 10
+lm_studio:
+  context_window: 4096
+  enable_streaming: false
+  max_tokens: 2048
+  model_name: auto
+  retry_attempts: 3
+  temperature: 0.7
+  timeout: 30
+  url: http://192.168.178.44:1234/v1
+memory:
+  auto_consolidation: true
+  consolidation_interval: 3600
+  consolidation_threshold: 0.7
+  data_dir: data/kira_memory
+  enable_caching: true
+  enable_memory: true
+  enable_storage: true
+  enable_vector_search: false
+  importance_threshold: 5
+  ltm_capacity: 1000
+  memory_file_path: memory/data/kira_memory.json
+  stm_capacity: 50
+  storage_backend: sqlite
+performance:
+  cache_ttl: 300
+  enable_caching: true
+  enable_compression: true
+  enable_profiling: false
+  log_level: INFO
+  max_concurrent_requests: 10
+  memory_limit_mb: 2048
+  request_timeout: 30
+security:
+  enable_content_filtering: true
+  enable_input_validation: true
+  enable_rate_limiting: true
+  enable_user_authentication: false
+  log_conversations: true
+  max_input_length: 5000
+  rate_limit_per_minute: 60
+  session_timeout: 3600
+system_info:
+  build: production
+  created_at: '2025-07-08T15:22:28.233017'
+  environment: development
+  last_updated: '2025-07-08T15:22:28.233016'
+  version: 2.0.0
+voice:
+  audio_buffer_size: 1024
+  auto_select_devices: true
+  bark_model: suno/bark
+  bark_text_temp: 0.7
+  bark_voice_preset: v2/en_speaker_6
+  bark_waveform_temp: 0.7
+  channels: 1
+  command_confidence_threshold: 0.7
+  default_emotion: calm
+  enable_auto_gain_control: true
+  enable_continuous_listening: true
+  enable_echo_cancellation: true
+  enable_emotion_synthesis: true
+  enable_hardware_detection: true
+  enable_noise_reduction: true
+  enable_speech_recognition: true
+  enable_voice: true
+  enable_voice_activity_detection: true
+  enable_voice_commands: true
+  enable_wake_word: true
+  max_recording_duration: 30
+  microphone_device: null
+  output_format: wav
+  processing_chunk_size: 1024
+  sample_rate: 24000
+  silence_timeout_ms: 2000
+  speaker_device: null
+  voice_activation_threshold: 0.02
+  voice_gender: female
+  voice_language: de
+  voice_quality: high
+  voice_speed: 1.0
+  wake_word_threshold: 0.8
+  wake_word_timeout: 30
+  wake_words:
+  - kira
+  - hey kira
+  whisper_model: base

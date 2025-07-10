@@ -1,0 +1,28 @@
+[
+  {
+    "user_input": "Hey Kira",
+    "kira_response": "Hallo! Wie kann ich dir heute helfen? 😊\n\n",
+    "timestamp": "2025-07-09T21:45:06.983826",
+    "metadata": {
+      "conversation_id": "web_conv_2025-07-09T19-45-04-545Z_qti1xwjyu",
+      "timestamp": "2025-07-09T21:45:06.983786",
+      "user_message_length": 8,
+      "kira_response_length": 41,
+      "message_type": "chat_interaction"
+    },
+    "id": 0
+  },
+  {
+    "user_input": "Hey Kira mein name ist leon freut mich",
+    "kira_response": "Hallo Leon! 🤗 Ich freue mich auch, dich kennenzulernen. Ich bin ein intelligentes KI-Assistent und stehe dir gerne bei allen Fragen oder Problemen zur Verfügung. Wenn du Hilfe benötigst, frag einfach los. 😊 Wie kann ich dir heute helfen?",
+    "timestamp": "2025-07-09T22:02:59.483311",
+    "metadata": {
+      "conversation_id": "web_conv_2025-07-09T20-02-55-057Z_o4zbzekr8",
+      "timestamp": "2025-07-09T22:02:59.433412",
+      "user_message_length": 38,
+      "kira_response_length": 237,
+      "message_type": "chat_interaction"
+    },
+    "id": 0
+  }
+]

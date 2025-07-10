@@ -1,0 +1,1572 @@
+{% extends "layouts/dashboard.html" %}
+{% set show_sidebar = true %}
+
+{% block title %}Kira - Todo Dashboard{% endblock %}
+
+{% block dashboard_icon %}<i class="fas fa-tasks"></i>{% endblock %}
+{% block dashboard_title %}Task Management{% endblock %}
+{% block dashboard_description %}Intelligent Task Management & Productivity Analytics - AI-Powered Todo Organization{% endblock %}
+
+{% block dashboard_stats %}
+<div class="dashboard-stats" id="todoOverview">
+    <!-- Todo stats werden dynamisch gefüllt -->
+</div>
+{% endblock %}
+
+{% block main_content %}
+<!-- Quick Add Task Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-plus-circle me-2"></i>
+            Quick Add Task
+        </h3>
+    </div>
+    <div class="quick-add-container">
+        <form id="quickAddForm" class="quick-add-form">
+            <div class="input-group">
+                <input type="text" 
+                       class="form-control quick-task-input" 
+                       id="quickTaskInput" 
+                       placeholder="Was möchtest du erledigen? (z.B. 'Meeting um 15:00' oder 'Python lernen')"
+                       autocomplete="off">
+                <button type="submit" class="btn btn-kira">
+                    <i class="fas fa-plus me-2"></i>
+                    Add Task
+                </button>
+            </div>
+            <div class="quick-suggestions" id="quickSuggestions">
+                <!-- AI suggestions werden hier angezeigt -->
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Active Tasks Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-clipboard-list me-2"></i>
+            Active Tasks
+        </h3>
+        <div class="task-controls">
+            <select class="form-select form-select-sm" id="taskFilter" onchange="filterTasks()">
+                <option value="all">All Tasks</option>
+                <option value="today">Today</option>
+                <option value="urgent">Urgent</option>
+                <option value="overdue">Overdue</option>
+            </select>
+            <select class="form-select form-select-sm" id="taskSort" onchange="sortTasks()">
+                <option value="priority">By Priority</option>
+                <option value="date">By Date</option>
+                <option value="category">By Category</option>
+            </select>
+        </div>
+    </div>
+    <div id="activeTasksList">
+        <!-- Active tasks werden hier angezeigt -->
+    </div>
+</div>
+
+<!-- Task Categories Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-folder-open me-2"></i>
+            Task Categories
+        </h3>
+    </div>
+    <div class="categories-grid" id="categoriesGrid">
+        <!-- Categories werden hier angezeigt -->
+    </div>
+</div>
+
+<!-- Productivity Analytics Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-chart-line me-2"></i>
+            Productivity Analytics
+        </h3>
+    </div>
+    <div class="analytics-container">
+        <div class="row">
+            <div class="col-md-6">
+                <canvas id="completionChart" height="250"></canvas>
+            </div>
+            <div class="col-md-6">
+                <canvas id="categoryChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block side_content %}
+<!-- Today's Focus Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-bullseye me-2"></i>
+            Today's Focus
+        </h4>
+    </div>
+    <div id="todaysFocus">
+        <!-- Today's focus tasks -->
+    </div>
+</div>
+
+<!-- Upcoming Tasks Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-calendar-alt me-2"></i>
+            Upcoming Tasks
+        </h4>
+    </div>
+    <div id="upcomingTasks">
+        <!-- Upcoming tasks werden hier angezeigt -->
+    </div>
+</div>
+
+<!-- Progress Tracking Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-chart-pie me-2"></i>
+            Progress Tracking
+        </h4>
+    </div>
+    <div id="progressTracking">
+        <!-- Progress indicators -->
+    </div>
+</div>
+
+<!-- AI Insights Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-brain me-2"></i>
+            AI Insights
+        </h4>
+    </div>
+    <div id="aiInsights">
+        <!-- AI-powered insights -->
+    </div>
+</div>
+
+<!-- Task Templates Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-layer-group me-2"></i>
+            Quick Templates
+        </h4>
+    </div>
+    <div class="task-templates" id="taskTemplates">
+        <!-- Task templates werden hier angezeigt -->
+    </div>
+</div>
+
+<!-- Task Tools Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-tools me-2"></i>
+            Task Tools
+        </h4>
+    </div>
+    <div class="task-tools">
+        <button class="btn btn-kira btn-sm w-100 mb-2" onclick="bulkActions()">
+            <i class="fas fa-list-check me-2"></i>
+            Bulk Actions
+        </button>
+        <button class="btn btn-outline-kira btn-sm w-100 mb-2" onclick="exportTasks()">
+            <i class="fas fa-download me-2"></i>
+            Export Tasks
+        </button>
+        <button class="btn btn-outline-info btn-sm w-100 mb-2" onclick="analyzeProductivity()">
+            <i class="fas fa-chart-bar me-2"></i>
+            Analyze Productivity
+        </button>
+        <button class="btn btn-outline-secondary btn-sm w-100" onclick="archiveCompleted()">
+            <i class="fas fa-archive me-2"></i>
+            Archive Completed
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+{{ super() }}
+<style>
+    .quick-add-container {
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-lg);
+        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .quick-add-form {
+        position: relative;
+    }
+
+    .quick-task-input {
+        border: 2px solid var(--kira-gray-200);
+        border-radius: var(--radius-lg);
+        padding: var(--spacing-md) var(--spacing-lg);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .quick-task-input:focus {
+        border-color: var(--kira-primary);
+        box-shadow: 0 0 0 3px rgba(0, 210, 211, 0.1);
+        background: white;
+    }
+
+    .quick-suggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid var(--kira-gray-200);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+        z-index: 1000;
+        max-height: 200px;
+        overflow-y: auto;
+        display: none;
+    }
+
+    .suggestion-item {
+        padding: var(--spacing-md);
+        border-bottom: 1px solid var(--kira-gray-100);
+        cursor: pointer;
+        transition: background 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+    }
+
+    .suggestion-item:hover {
+        background: var(--kira-gray-50);
+    }
+
+    .suggestion-item:last-child {
+        border-bottom: none;
+    }
+
+    .suggestion-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        color: white;
+    }
+
+    .suggestion-text {
+        flex: 1;
+        font-size: 0.9rem;
+        color: var(--kira-gray-700);
+    }
+
+    .task-controls {
+        display: flex;
+        gap: var(--spacing-sm);
+        align-items: center;
+    }
+
+    .task-item {
+        background: white;
+        border: 1px solid var(--kira-gray-200);
+        border-radius: var(--radius-lg);
+        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-md);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .task-item:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--kira-primary);
+    }
+
+    .task-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        transition: width 0.3s ease;
+    }
+
+    .task-item:hover::before {
+        width: 8px;
+    }
+
+    .task-item.priority-high::before { background: var(--kira-danger); }
+    .task-item.priority-medium::before { background: var(--kira-warning); }
+    .task-item.priority-low::before { background: var(--kira-success); }
+    .task-item.completed::before { background: var(--kira-gray-400); }
+
+    .task-item.completed {
+        opacity: 0.7;
+        background: var(--kira-gray-50);
+    }
+
+    .task-item.overdue {
+        border-color: var(--kira-danger);
+        background: rgba(239, 68, 68, 0.05);
+    }
+
+    .task-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: var(--spacing-md);
+    }
+
+    .task-checkbox {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--kira-gray-300);
+        border-radius: var(--radius-sm);
+        margin-right: var(--spacing-md);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .task-checkbox:hover {
+        border-color: var(--kira-primary);
+    }
+
+    .task-checkbox.checked {
+        background: var(--kira-success);
+        border-color: var(--kira-success);
+        color: white;
+    }
+
+    .task-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .task-title {
+        font-weight: 600;
+        color: var(--kira-gray-800);
+        font-size: 1.1rem;
+        margin-bottom: 4px;
+        line-height: 1.4;
+    }
+
+    .task-item.completed .task-title {
+        text-decoration: line-through;
+        color: var(--kira-gray-500);
+    }
+
+    .task-description {
+        color: var(--kira-gray-600);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .task-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--spacing-sm);
+        align-items: center;
+        font-size: 0.875rem;
+        color: var(--kira-gray-500);
+    }
+
+    .task-category {
+        background: var(--kira-primary);
+        color: white;
+        padding: 2px 8px;
+        border-radius: var(--radius-sm);
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .task-due-date {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .task-due-date.overdue {
+        color: var(--kira-danger);
+        font-weight: 600;
+    }
+
+    .task-due-date.today {
+        color: var(--kira-warning);
+        font-weight: 600;
+    }
+
+    .task-priority {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .priority-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+
+    .priority-high .priority-dot { background: var(--kira-danger); }
+    .priority-medium .priority-dot { background: var(--kira-warning); }
+    .priority-low .priority-dot { background: var(--kira-success); }
+
+    .task-actions {
+        display: flex;
+        gap: var(--spacing-xs);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .task-item:hover .task-actions {
+        opacity: 1;
+    }
+
+    .task-action-btn {
+        width: 32px;
+        height: 32px;
+        border: none;
+        border-radius: var(--radius-md);
+        background: var(--kira-gray-100);
+        color: var(--kira-gray-600);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+    }
+
+    .task-action-btn:hover {
+        background: var(--kira-primary);
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--spacing-md);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .category-card {
+        background: white;
+        border: 2px solid var(--kira-gray-200);
+        border-radius: var(--radius-lg);
+        padding: var(--spacing-lg);
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .category-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--kira-primary);
+    }
+
+    .category-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+    }
+
+    .category-card.work::before { background: var(--kira-todo-1); }
+    .category-card.personal::before { background: var(--kira-todo-2); }
+    .category-card.learning::before { background: var(--kira-todo-3); }
+    .category-card.health::before { background: var(--kira-todo-4); }
+
+    .category-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        margin: 0 auto var(--spacing-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        box-shadow: var(--shadow-md);
+    }
+
+    .category-name {
+        font-weight: 600;
+        color: var(--kira-gray-800);
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .category-count {
+        color: var(--kira-gray-600);
+        font-size: 0.875rem;
+    }
+
+    .analytics-container {
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-lg);
+        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .focus-task {
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-md);
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-sm);
+        border-left: 4px solid var(--kira-primary);
+        transition: all 0.2s ease;
+    }
+
+    .focus-task:hover {
+        background: white;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .focus-task:last-child {
+        margin-bottom: 0;
+    }
+
+    .focus-title {
+        font-weight: 600;
+        color: var(--kira-gray-800);
+        margin-bottom: 4px;
+    }
+
+    .focus-time {
+        font-size: 0.75rem;
+        color: var(--kira-gray-500);
+    }
+
+    .upcoming-task {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-sm) var(--spacing-md);
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--spacing-sm);
+        transition: all 0.2s ease;
+    }
+
+    .upcoming-task:hover {
+        background: white;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .upcoming-task:last-child {
+        margin-bottom: 0;
+    }
+
+    .upcoming-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .upcoming-title {
+        font-weight: 500;
+        color: var(--kira-gray-800);
+        font-size: 0.9rem;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .upcoming-date {
+        font-size: 0.75rem;
+        color: var(--kira-gray-500);
+    }
+
+    .progress-item {
+        margin-bottom: var(--spacing-md);
+    }
+
+    .progress-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .progress-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-xs);
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--kira-gray-700);
+    }
+
+    .progress-bar {
+        height: 8px;
+        background: var(--kira-gray-200);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.5s ease;
+    }
+
+    .ai-insight {
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-md);
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-sm);
+        border-left: 4px solid var(--kira-neural-1);
+    }
+
+    .ai-insight:last-child {
+        margin-bottom: 0;
+    }
+
+    .insight-icon {
+        color: var(--kira-neural-1);
+        margin-right: var(--spacing-sm);
+    }
+
+    .insight-text {
+        color: var(--kira-gray-700);
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .task-template {
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-md);
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-sm);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+    }
+
+    .task-template:hover {
+        background: white;
+        border-color: var(--kira-primary);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .task-template:last-child {
+        margin-bottom: 0;
+    }
+
+    .template-icon {
+        color: var(--kira-primary);
+        margin-right: var(--spacing-sm);
+    }
+
+    .template-name {
+        font-weight: 500;
+        color: var(--kira-gray-800);
+        margin-bottom: 2px;
+    }
+
+    .template-description {
+        font-size: 0.75rem;
+        color: var(--kira-gray-500);
+    }
+
+    .task-tools .btn {
+        transition: all 0.2s ease;
+    }
+
+    .task-tools .btn:hover {
+        transform: translateY(-1px);
+    }
+
+    /* Loading States */
+    .task-loading {
+        background: linear-gradient(90deg, var(--kira-gray-200) 25%, var(--kira-gray-100) 50%, var(--kira-gray-200) 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        height: 120px;
+        border-radius: var(--radius-lg);
+        margin-bottom: var(--spacing-md);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .categories-grid {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+
+        .task-controls {
+            flex-direction: column;
+            align-items: stretch;
+            gap: var(--spacing-sm);
+        }
+
+        .task-header {
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .task-actions {
+            opacity: 1;
+        }
+
+        .analytics-container .row {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    class TodoDashboard {
+        constructor() {
+            this.baseUrl = '/api/todos';
+            this.updateInterval = 30000;
+            this.charts = {};
+            this.tasks = [];
+            this.categories = ['work', 'personal', 'learning', 'health'];
+            
+            this.init();
+        }
+
+        async init() {
+            console.log('✅ Todo Dashboard wird initialisiert...');
+            
+            // Initial data load
+            await this.loadAllTodoData();
+            
+            // Initialize charts
+            this.initCharts();
+            
+            // Setup event listeners
+            this.setupEventListeners();
+            
+            // Start real-time updates
+            this.startRealTimeUpdates();
+            
+            console.log('✅ Todo Dashboard bereit');
+        }
+
+        async loadAllTodoData() {
+            this.showLoadingStates();
+            
+            try {
+                await Promise.all([
+                    this.loadTodoOverview(),
+                    this.loadActiveTasks(),
+                    this.loadCategories(),
+                    this.loadTodaysFocus(),
+                    this.loadUpcomingTasks(),
+                    this.loadProgressTracking(),
+                    this.loadAIInsights(),
+                    this.loadTaskTemplates()
+                ]);
+            } catch (error) {
+                console.error('❌ Todo dashboard load error:', error);
+                this.showFallbackData();
+            }
+        }
+
+        showLoadingStates() {
+            document.getElementById('activeTasksList').innerHTML = 
+                Array(3).fill().map(() => '<div class="task-loading"></div>').join('');
+        }
+
+        async loadTodoOverview() {
+            try {
+                const response = await fetch(`${this.baseUrl}/overview`);
+                if (response.ok) {
+                    const data = await response.json();
+                    this.updateTodoOverview(data);
+                } else {
+                    this.loadFallbackOverview();
+                }
+            } catch (error) {
+                console.warn('Todo overview fallback:', error);
+                this.loadFallbackOverview();
+            }
+        }
+
+        updateTodoOverview(data) {
+            const container = document.getElementById('todoOverview');
+            const stats = [
+                { 
+                    icon: 'fas fa-tasks', 
+                    label: 'Total Tasks', 
+                    value: data.total_tasks || '24', 
+                    color: 'var(--kira-todo-1)' 
+                },
+                { 
+                    icon: 'fas fa-check-circle', 
+                    label: 'Completed', 
+                    value: data.completed_tasks || '12', 
+                    color: 'var(--kira-todo-2)' 
+                },
+                { 
+                    icon: 'fas fa-clock', 
+                    label: 'Pending', 
+                    value: data.pending_tasks || '8', 
+                    color: 'var(--kira-todo-3)' 
+                },
+                { 
+                    icon: 'fas fa-exclamation-triangle', 
+                    label: 'Overdue', 
+                    value: data.overdue_tasks || '4', 
+                    color: 'var(--kira-todo-4)' 
+                }
+            ];
+
+            container.innerHTML = stats.map(stat => 
+                DashboardUtils.createStatCard(stat.icon, stat.label, stat.value, stat.color)
+            ).join('');
+        }
+
+        loadFallbackOverview() {
+            this.updateTodoOverview({
+                total_tasks: Math.floor(Math.random() * 20) + 15,
+                completed_tasks: Math.floor(Math.random() * 10) + 8,
+                pending_tasks: Math.floor(Math.random() * 8) + 5,
+                overdue_tasks: Math.floor(Math.random() * 5) + 2
+            });
+        }
+
+        async loadActiveTasks() {
+            const container = document.getElementById('activeTasksList');
+            
+            this.tasks = [
+                {
+                    id: 'task_1',
+                    title: 'Finish Python machine learning project',
+                    description: 'Complete the neural network implementation and test with sample data',
+                    category: 'work',
+                    priority: 'high',
+                    dueDate: new Date(Date.now() + 86400000), // Tomorrow
+                    completed: false,
+                    createdAt: new Date(Date.now() - 86400000 * 2)
+                },
+                {
+                    id: 'task_2',
+                    title: 'Buy groceries for the week',
+                    description: 'Milk, bread, vegetables, and fruits',
+                    category: 'personal',
+                    priority: 'medium',
+                    dueDate: new Date(Date.now() + 3600000 * 6), // Today evening
+                    completed: false,
+                    createdAt: new Date(Date.now() - 86400000)
+                },
+                {
+                    id: 'task_3',
+                    title: 'Read JavaScript ES6 documentation',
+                    description: 'Study async/await patterns and new array methods',
+                    category: 'learning',
+                    priority: 'low',
+                    dueDate: new Date(Date.now() + 86400000 * 3), // In 3 days
+                    completed: false,
+                    createdAt: new Date(Date.now() - 3600000 * 12)
+                },
+                {
+                    id: 'task_4',
+                    title: 'Schedule doctor appointment',
+                    description: 'Annual checkup and blood work',
+                    category: 'health',
+                    priority: 'medium',
+                    dueDate: new Date(Date.now() - 86400000), // Yesterday (overdue)
+                    completed: false,
+                    createdAt: new Date(Date.now() - 86400000 * 5)
+                },
+                {
+                    id: 'task_5',
+                    title: 'Update portfolio website',
+                    description: 'Add new projects and update skills section',
+                    category: 'work',
+                    priority: 'high',
+                    dueDate: new Date(Date.now() + 86400000 * 7), // Next week
+                    completed: true,
+                    createdAt: new Date(Date.now() - 86400000 * 3)
+                }
+            ];
+
+            container.innerHTML = this.tasks.map(task => this.createTaskCard(task)).join('');
+        }
+
+        createTaskCard(task) {
+            const isOverdue = task.dueDate < new Date() && !task.completed;
+            const isToday = this.isToday(task.dueDate);
+            const timeAgo = this.getTimeAgo(task.createdAt);
+            const dueText = this.formatDueDate(task.dueDate);
+            
+            const priorityClass = `priority-${task.priority}`;
+            const statusClass = task.completed ? 'completed' : (isOverdue ? 'overdue' : '');
+            
+            return `
+                <div class="task-item ${priorityClass} ${statusClass}" data-task-id="${task.id}">
+                    <div class="task-header">
+                        <div class="d-flex align-items-start w-100">
+                            <div class="task-checkbox ${task.completed ? 'checked' : ''}" 
+                                 onclick="toggleTask('${task.id}')">
+                                ${task.completed ? '<i class="fas fa-check"></i>' : ''}
+                            </div>
+                            <div class="task-content">
+                                <h5 class="task-title">${task.title}</h5>
+                                <p class="task-description">${task.description}</p>
+                                <div class="task-meta">
+                                    <span class="task-category" style="background: ${this.getCategoryColor(task.category)};">
+                                        ${task.category}
+                                    </span>
+                                    <span class="task-due-date ${isOverdue ? 'overdue' : (isToday ? 'today' : '')}">
+                                        <i class="fas fa-calendar"></i>
+                                        ${dueText}
+                                    </span>
+                                    <span class="task-priority ${priorityClass}">
+                                        <span class="priority-dot"></span>
+                                        ${task.priority}
+                                    </span>
+                                    <span>Created ${timeAgo}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="task-actions">
+                            <button class="task-action-btn" onclick="editTask('${task.id}')" title="Edit Task">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="task-action-btn" onclick="deleteTask('${task.id}')" title="Delete Task">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        getCategoryColor(category) {
+            const colors = {
+                work: 'var(--kira-todo-1)',
+                personal: 'var(--kira-todo-2)',
+                learning: 'var(--kira-todo-3)',
+                health: 'var(--kira-todo-4)'
+            };
+            return colors[category] || 'var(--kira-gray-400)';
+        }
+
+        getCategoryIcon(category) {
+            const icons = {
+                work: 'fas fa-briefcase',
+                personal: 'fas fa-home',
+                learning: 'fas fa-graduation-cap',
+                health: 'fas fa-heartbeat'
+            };
+            return icons[category] || 'fas fa-folder';
+        }
+
+        async loadCategories() {
+            const container = document.getElementById('categoriesGrid');
+            
+            const categoryStats = {
+                work: { count: 8, completed: 3 },
+                personal: { count: 6, completed: 4 },
+                learning: { count: 5, completed: 2 },
+                health: { count: 3, completed: 1 }
+            };
+
+            container.innerHTML = this.categories.map(category => {
+                const stats = categoryStats[category];
+                return `
+                    <div class="category-card ${category}" onclick="filterByCategory('${category}')">
+                        <div class="category-icon" style="background: ${this.getCategoryColor(category)};">
+                            <i class="${this.getCategoryIcon(category)}"></i>
+                        </div>
+                        <div class="category-name">${category.charAt(0).toUpperCase() + category.slice(1)}</div>
+                        <div class="category-count">${stats.completed}/${stats.count} completed</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async loadTodaysFocus() {
+            const container = document.getElementById('todaysFocus');
+            
+            const focusTasks = this.tasks
+                .filter(task => !task.completed && (this.isToday(task.dueDate) || task.priority === 'high'))
+                .slice(0, 3);
+
+            if (focusTasks.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-check-circle fa-2x mb-2" style="color: var(--kira-success);"></i>
+                        <p>Alle wichtigen Tasks erledigt!</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = focusTasks.map(task => `
+                    <div class="focus-task" onclick="scrollToTask('${task.id}')">
+                        <div class="focus-title">${task.title}</div>
+                        <div class="focus-time">${this.formatDueDate(task.dueDate)}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        async loadUpcomingTasks() {
+            const container = document.getElementById('upcomingTasks');
+            
+            const upcomingTasks = this.tasks
+                .filter(task => !task.completed && task.dueDate > new Date())
+                .sort((a, b) => a.dueDate - b.dueDate)
+                .slice(0, 5);
+
+            container.innerHTML = upcomingTasks.map(task => `
+                <div class="upcoming-task" onclick="scrollToTask('${task.id}')">
+                    <div class="upcoming-info">
+                        <div class="upcoming-title">${task.title}</div>
+                        <div class="upcoming-date">${this.formatDueDate(task.dueDate)}</div>
+                    </div>
+                    <span class="priority-dot" style="background: ${this.getPriorityColor(task.priority)};"></span>
+                </div>
+            `).join('');
+        }
+
+        getPriorityColor(priority) {
+            const colors = {
+                high: 'var(--kira-danger)',
+                medium: 'var(--kira-warning)',
+                low: 'var(--kira-success)'
+            };
+            return colors[priority] || 'var(--kira-gray-400)';
+        }
+
+        async loadProgressTracking() {
+            const container = document.getElementById('progressTracking');
+            
+            const progressData = [
+                { label: 'Today\'s Progress', value: 67, color: 'var(--kira-todo-1)' },
+                { label: 'Weekly Progress', value: 54, color: 'var(--kira-todo-2)' },
+                { label: 'Monthly Progress', value: 78, color: 'var(--kira-todo-3)' }
+            ];
+
+            container.innerHTML = progressData.map(item => `
+                <div class="progress-item">
+                    <div class="progress-label">
+                        <span>${item.label}</span>
+                        <span>${item.value}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${item.value}%; background: ${item.color};"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async loadAIInsights() {
+            const container = document.getElementById('aiInsights');
+            
+            const insights = [
+                {
+                    icon: 'fas fa-lightbulb',
+                    text: 'Du arbeitest am produktivsten zwischen 9-11 Uhr. Plane wichtige Tasks in dieser Zeit.'
+                },
+                {
+                    icon: 'fas fa-chart-trend-up',
+                    text: 'Deine Completion-Rate ist diese Woche um 15% gestiegen. Weiter so!'
+                },
+                {
+                    icon: 'fas fa-clock',
+                    text: 'Du hast 3 Tasks, die bald überfällig werden. Prioritäten anpassen?'
+                }
+            ];
+
+            container.innerHTML = insights.map(insight => `
+                <div class="ai-insight">
+                    <i class="${insight.icon} insight-icon"></i>
+                    <span class="insight-text">${insight.text}</span>
+                </div>
+            `).join('');
+        }
+
+        async loadTaskTemplates() {
+            const container = document.getElementById('taskTemplates');
+            
+            const templates = [
+                {
+                    name: 'Daily Standup',
+                    description: 'Prepare for team meeting',
+                    icon: 'fas fa-users'
+                },
+                {
+                    name: 'Code Review',
+                    description: 'Review team member\'s code',
+                    icon: 'fas fa-code'
+                },
+                {
+                    name: 'Weekly Planning',
+                    description: 'Plan tasks for the week',
+                    icon: 'fas fa-calendar-week'
+                },
+                {
+                    name: 'Learning Session',
+                    description: 'Study new technology',
+                    icon: 'fas fa-book'
+                }
+            ];
+
+            container.innerHTML = templates.map(template => `
+                <div class="task-template" onclick="createFromTemplate('${template.name}')">
+                    <i class="${template.icon} template-icon"></i>
+                    <div class="template-name">${template.name}</div>
+                    <div class="template-description">${template.description}</div>
+                </div>
+            `).join('');
+        }
+
+        initCharts() {
+            this.initCompletionChart();
+            this.initCategoryChart();
+        }
+
+        initCompletionChart() {
+            const ctx = document.getElementById('completionChart').getContext('2d');
+            
+            this.charts.completion = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Completed Tasks',
+                        data: [3, 5, 2, 8, 6, 4, 7],
+                        borderColor: 'var(--kira-todo-1)',
+                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Weekly Completion Trend'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        initCategoryChart() {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            
+            this.charts.category = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Work', 'Personal', 'Learning', 'Health'],
+                    datasets: [{
+                        data: [8, 6, 5, 3],
+                        backgroundColor: [
+                            'var(--kira-todo-1)',
+                            'var(--kira-todo-2)',
+                            'var(--kira-todo-3)',
+                            'var(--kira-todo-4)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Tasks by Category'
+                        }
+                    }
+                }
+            });
+        }
+
+        setupEventListeners() {
+            // Quick add form
+            document.getElementById('quickAddForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleQuickAdd();
+            });
+
+            // Input suggestions
+            document.getElementById('quickTaskInput').addEventListener('input', (e) => {
+                this.showSuggestions(e.target.value);
+            });
+
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.quick-add-form')) {
+                    this.hideSuggestions();
+                }
+            });
+        }
+
+        handleQuickAdd() {
+            const input = document.getElementById('quickTaskInput');
+            const taskText = input.value.trim();
+            
+            if (taskText) {
+                console.log('📝 Adding new task:', taskText);
+                
+                // Parse task using AI-like logic
+                const newTask = this.parseTaskInput(taskText);
+                
+                // Add to tasks array
+                this.tasks.unshift(newTask);
+                
+                // Refresh display
+                this.loadActiveTasks();
+                this.loadTodoOverview();
+                this.loadTodaysFocus();
+                
+                // Clear input
+                input.value = '';
+                this.hideSuggestions();
+                
+                // Show success feedback
+                this.showToast('Task erfolgreich hinzugefügt!', 'success');
+            }
+        }
+
+        parseTaskInput(text) {
+            // Simple AI-like parsing
+            let category = 'personal';
+            let priority = 'medium';
+            let dueDate = new Date(Date.now() + 86400000); // Default: tomorrow
+            
+            // Category detection
+            if (text.toLowerCase().includes('arbeit') || text.toLowerCase().includes('meeting') || text.toLowerCase().includes('projekt')) {
+                category = 'work';
+            } else if (text.toLowerCase().includes('lernen') || text.toLowerCase().includes('studieren') || text.toLowerCase().includes('kurs')) {
+                category = 'learning';
+            } else if (text.toLowerCase().includes('arzt') || text.toLowerCase().includes('sport') || text.toLowerCase().includes('gesundheit')) {
+                category = 'health';
+            }
+            
+            // Priority detection
+            if (text.toLowerCase().includes('wichtig') || text.toLowerCase().includes('urgent') || text.toLowerCase().includes('dringend')) {
+                priority = 'high';
+            } else if (text.toLowerCase().includes('später') || text.toLowerCase().includes('irgendwann')) {
+                priority = 'low';
+            }
+            
+            // Time detection
+            if (text.toLowerCase().includes('heute')) {
+                dueDate = new Date();
+            } else if (text.toLowerCase().includes('morgen')) {
+                dueDate = new Date(Date.now() + 86400000);
+            }
+            
+            return {
+                id: 'task_' + Date.now(),
+                title: text,
+                description: '',
+                category: category,
+                priority: priority,
+                dueDate: dueDate,
+                completed: false,
+                createdAt: new Date()
+            };
+        }
+
+        showSuggestions(input) {
+            const suggestions = document.getElementById('quickSuggestions');
+            
+            if (input.length < 2) {
+                this.hideSuggestions();
+                return;
+            }
+            
+            const suggestionList = [
+                { text: 'Meeting um 15:00 vorbereiten', icon: 'fas fa-users', color: 'var(--kira-todo-1)' },
+                { text: 'Einkaufsliste erstellen', icon: 'fas fa-shopping-cart', color: 'var(--kira-todo-2)' },
+                { text: 'JavaScript Tutorial ansehen', icon: 'fas fa-play', color: 'var(--kira-todo-3)' },
+                { text: 'Arzttermin vereinbaren', icon: 'fas fa-calendar-plus', color: 'var(--kira-todo-4)' }
+            ];
+            
+            const filtered = suggestionList.filter(s => 
+                s.text.toLowerCase().includes(input.toLowerCase())
+            );
+            
+            if (filtered.length > 0) {
+                suggestions.innerHTML = filtered.map(suggestion => `
+                    <div class="suggestion-item" onclick="selectSuggestion('${suggestion.text}')">
+                        <div class="suggestion-icon" style="background: ${suggestion.color};">
+                            <i class="${suggestion.icon}"></i>
+                        </div>
+                        <div class="suggestion-text">${suggestion.text}</div>
+                    </div>
+                `).join('');
+                suggestions.style.display = 'block';
+            } else {
+                this.hideSuggestions();
+            }
+        }
+
+        hideSuggestions() {
+            document.getElementById('quickSuggestions').style.display = 'none';
+        }
+
+        startRealTimeUpdates() {
+            startAutoRefresh(() => {
+                this.loadTodoOverview();
+                this.loadTodaysFocus();
+                this.loadProgressTracking();
+            }, this.updateInterval);
+        }
+
+        // Utility methods
+        isToday(date) {
+            const today = new Date();
+            return date.toDateString() === today.toDateString();
+        }
+
+        getTimeAgo(date) {
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+
+            if (days > 0) return `vor ${days}d`;
+            if (hours > 0) return `vor ${hours}h`;
+            if (minutes > 0) return `vor ${minutes}m`;
+            return 'gerade eben';
+        }
+
+        formatDueDate(date) {
+            const now = new Date();
+            const diff = date - now;
+            const days = Math.floor(diff / 86400000);
+            
+            if (this.isToday(date)) return 'Heute';
+            if (days === 1) return 'Morgen';
+            if (days === -1) return 'Gestern';
+            if (days < -1) return `${Math.abs(days)} Tage überfällig`;
+            if (days < 7) return `In ${days} Tagen`;
+            
+            return date.toLocaleDateString('de-DE');
+        }
+
+        showToast(message, type = 'info') {
+            // Simple toast notification
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        showFallbackData() {
+            console.log('✅ Zeige Todo Fallback-Daten');
+            this.loadFallbackOverview();
+            this.loadActiveTasks();
+            this.loadCategories();
+            this.loadTodaysFocus();
+            this.loadUpcomingTasks();
+            this.loadProgressTracking();
+            this.loadAIInsights();
+            this.loadTaskTemplates();
+        }
+    }
+
+    // Global functions
+    function toggleTask(taskId) {
+        console.log(`✅ Toggling task: ${taskId}`);
+        if (window.todoDashboard) {
+            const task = window.todoDashboard.tasks.find(t => t.id === taskId);
+            if (task) {
+                task.completed = !task.completed;
+                window.todoDashboard.loadActiveTasks();
+                window.todoDashboard.loadTodoOverview();
+                window.todoDashboard.loadTodaysFocus();
+                
+                const action = task.completed ? 'abgeschlossen' : 'wiedereröffnet';
+                window.todoDashboard.showToast(`Task ${action}!`, task.completed ? 'success' : 'info');
+            }
+        }
+    }
+
+    function editTask(taskId) {
+        console.log(`✏️ Editing task: ${taskId}`);
+        alert(`Task ${taskId} wird bearbeitet...`);
+    }
+
+    function deleteTask(taskId) {
+        console.log(`🗑️ Deleting task: ${taskId}`);
+        if (confirm('Task wirklich löschen?')) {
+            if (window.todoDashboard) {
+                window.todoDashboard.tasks = window.todoDashboard.tasks.filter(t => t.id !== taskId);
+                window.todoDashboard.loadActiveTasks();
+                window.todoDashboard.loadTodoOverview();
+                window.todoDashboard.showToast('Task gelöscht!', 'warning');
+            }
+        }
+    }
+
+    function filterTasks() {
+        const filterValue = document.getElementById('taskFilter').value;
+        console.log(`🔍 Filtering tasks: ${filterValue}`);
+        
+        const taskItems = document.querySelectorAll('.task-item');
+        taskItems.forEach(item => {
+            const taskId = item.dataset.taskId;
+            const task = window.todoDashboard?.tasks.find(t => t.id === taskId);
+            
+            if (!task) return;
+            
+            let show = true;
+            
+            switch(filterValue) {
+                case 'today':
+                    show = window.todoDashboard.isToday(task.dueDate);
+                    break;
+                case 'urgent':
+                    show = task.priority === 'high';
+                    break;
+                case 'overdue':
+                    show = task.dueDate < new Date() && !task.completed;
+                    break;
+                default:
+                    show = true;
+            }
+            
+            item.style.display = show ? 'block' : 'none';
+        });
+    }
+
+    function sortTasks() {
+        const sortValue = document.getElementById('taskSort').value;
+        console.log(`🔄 Sorting tasks: ${sortValue}`);
+        
+        if (window.todoDashboard) {
+            let sortedTasks = [...window.todoDashboard.tasks];
+            
+            switch(sortValue) {
+                case 'priority':
+                    const priorityOrder = { high: 3, medium: 2, low: 1 };
+                    sortedTasks.sort((a, b) => priorityOrder[b.priority] - priorityOrder[a.priority]);
+                    break;
+                case 'date':
+                    sortedTasks.sort((a, b) => a.dueDate - b.dueDate);
+                    break;
+                case 'category':
+                    sortedTasks.sort((a, b) => a.category.localeCompare(b.category));
+                    break;
+            }
+            
+            window.todoDashboard.tasks = sortedTasks;
+            window.todoDashboard.loadActiveTasks();
+        }
+    }
+
+    function filterByCategory(category) {
+        console.log(`📁 Filtering by category: ${category}`);
+        
+        const taskItems = document.querySelectorAll('.task-item');
+        taskItems.forEach(item => {
+            const taskId = item.dataset.taskId;
+            const task = window.todoDashboard?.tasks.find(t => t.id === taskId);
+            
+            if (task) {
+                item.style.display = task.category === category ? 'block' : 'none';
+            }
+        });
+    }
+
+    function scrollToTask(taskId) {
+        console.log(`📍 Scrolling to task: ${taskId}`);
+        const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
+        if (taskElement) {
+            taskElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            taskElement.style.animation = 'pulse 1s ease-in-out';
+        }
+    }
+
+    function selectSuggestion(text) {
+        document.getElementById('quickTaskInput').value = text;
+        window.todoDashboard?.hideSuggestions();
+    }
+
+    function createFromTemplate(templateName) {
+        console.log(`📋 Creating task from template: ${templateName}`);
+        document.getElementById('quickTaskInput').value = templateName;
+        window.todoDashboard?.hideSuggestions();
+    }
+
+    function bulkActions() {
+        console.log('📦 Opening bulk actions...');
+        alert('Bulk actions panel wird geöffnet...');
+    }
+
+    function exportTasks() {
+        console.log('📥 Exporting tasks...');
+        alert('Task export wird vorbereitet...');
+    }
+
+    function analyzeProductivity() {
+        console.log('📊 Analyzing productivity...');
+        alert('Productivity analysis wird gestartet...');
+    }
+
+    function archiveCompleted() {
+        console.log('📦 Archiving completed tasks...');
+        if (confirm('Abgeschlossene Tasks archivieren?')) {
+            if (window.todoDashboard) {
+                window.todoDashboard.tasks = window.todoDashboard.tasks.filter(t => !t.completed);
+                window.todoDashboard.loadActiveTasks();
+                window.todoDashboard.loadTodoOverview();
+                window.todoDashboard.showToast('Abgeschlossene Tasks archiviert!', 'success');
+            }
+        }
+    }
+
+    // Initialize todo dashboard
+    document.addEventListener('DOMContentLoaded', () => {
+        window.todoDashboard = new TodoDashboard();
+    });
+</script>
+{% endblock %}

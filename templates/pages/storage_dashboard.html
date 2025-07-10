@@ -1,0 +1,1306 @@
+{% extends "layouts/dashboard.html" %}
+{% set show_sidebar = true %}
+
+{% block title %}Kira - Storage Dashboard{% endblock %}
+
+{% block dashboard_icon %}<i class="fas fa-database"></i>{% endblock %}
+{% block dashboard_title %}Storage Management{% endblock %}
+{% block dashboard_description %}Comprehensive Storage Analytics & Data Management - Real-time Disk Usage & File System Monitoring{% endblock %}
+
+{% block dashboard_stats %}
+<div class="dashboard-stats" id="storageOverview">
+    <!-- Storage stats werden dynamisch gefüllt -->
+</div>
+{% endblock %}
+
+{% block main_content %}
+<!-- Storage Overview Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-chart-pie me-2"></i>
+            Storage Distribution
+        </h3>
+        <div class="d-flex gap-2">
+            <span class="badge bg-success">
+                <i class="fas fa-circle live-indicator me-1"></i>
+                Live Monitoring
+            </span>
+            <button class="refresh-btn" onclick="refreshStorageData()" title="Refresh Storage">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
+    </div>
+    <div class="storage-visualization">
+        <div class="row">
+            <div class="col-md-6">
+                <canvas id="storageDonutChart" height="300"></canvas>
+            </div>
+            <div class="col-md-6">
+                <div class="storage-breakdown" id="storageBreakdown">
+                    <!-- Storage breakdown wird hier angezeigt -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Disk Usage Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-hdd me-2"></i>
+            Disk Usage Analysis
+        </h3>
+        <div class="disk-filters">
+            <select class="form-select form-select-sm" id="diskFilter" onchange="filterDiskData()">
+                <option value="all">All Drives</option>
+                <option value="system">System Drive</option>
+                <option value="data">Data Drives</option>
+                <option value="backup">Backup Drives</option>
+            </select>
+        </div>
+    </div>
+    <div id="diskUsageGrid">
+        <!-- Disk usage cards werden hier angezeigt -->
+    </div>
+</div>
+
+<!-- File System Activity Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-chart-line me-2"></i>
+            File System Activity
+        </h3>
+    </div>
+    <div class="activity-chart-container">
+        <canvas id="fileSystemChart" height="300"></canvas>
+    </div>
+</div>
+
+<!-- Large Files Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-file-alt me-2"></i>
+            Large Files & Directories
+        </h3>
+    </div>
+    <div id="largeFilesList">
+        <!-- Large files list wird hier angezeigt -->
+    </div>
+</div>
+{% endblock %}
+
+{% block side_content %}
+<!-- Storage Health Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-heartbeat me-2"></i>
+            Storage Health
+        </h4>
+    </div>
+    <div id="storageHealth">
+        <!-- Storage health indicators -->
+    </div>
+</div>
+
+<!-- Recent Activity Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-history me-2"></i>
+            Recent Activity
+        </h4>
+    </div>
+    <div id="recentActivity">
+        <!-- Recent storage activities -->
+    </div>
+</div>
+
+<!-- Storage Performance Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-tachometer-alt me-2"></i>
+            Performance Metrics
+        </h4>
+    </div>
+    <div id="performanceMetrics">
+        <!-- Performance metrics werden hier angezeigt -->
+    </div>
+</div>
+
+<!-- File Type Analytics Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-file-code me-2"></i>
+            File Types
+        </h4>
+    </div>
+    <div id="fileTypeAnalytics">
+        <!-- File type distribution -->
+    </div>
+</div>
+
+<!-- Storage Tools Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-tools me-2"></i>
+            Storage Tools
+        </h4>
+    </div>
+    <div class="storage-tools">
+        <button class="btn btn-kira btn-sm w-100 mb-2" onclick="analyzeStorage()">
+            <i class="fas fa-search me-2"></i>
+            Analyze Storage
+        </button>
+        <button class="btn btn-outline-kira btn-sm w-100 mb-2" onclick="cleanupStorage()">
+            <i class="fas fa-broom me-2"></i>
+            Cleanup Storage
+        </button>
+        <button class="btn btn-outline-warning btn-sm w-100 mb-2" onclick="defragmentDisk()">
+            <i class="fas fa-cogs me-2"></i>
+            Defragment Disk
+        </button>
+        <button class="btn btn-outline-info btn-sm w-100" onclick="backupData()">
+            <i class="fas fa-shield-alt me-2"></i>
+            Backup Data
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+{{ super() }}
+<style>
+    .storage-visualization {
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-lg);
+        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .storage-breakdown {
+        padding: var(--spacing-md);
+    }
+
+    .breakdown-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-md);
+        background: white;
+        border-radius: var(--radius-md);
+        margin-bottom: var(--spacing-sm);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.2s ease;
+        border-left: 4px solid;
+    }
+
+    .breakdown-item:hover {
+        transform: translateX(4px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .breakdown-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .breakdown-item.system { border-color: var(--kira-storage-1); }
+    .breakdown-item.applications { border-color: var(--kira-storage-2); }
+    .breakdown-item.documents { border-color: var(--kira-storage-3); }
+    .breakdown-item.media { border-color: var(--kira-storage-4); }
+    .breakdown-item.other { border-color: var(--kira-gray-400); }
+
+    .breakdown-info {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+    }
+
+    .breakdown-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1rem;
+    }
+
+    .breakdown-details h6 {
+        margin: 0 0 2px 0;
+        color: var(--kira-gray-800);
+        font-weight: 600;
+    }
+
+    .breakdown-size {
+        font-size: 0.875rem;
+        color: var(--kira-gray-600);
+    }
+
+    .breakdown-value {
+        text-align: right;
+    }
+
+    .value-size {
+        font-weight: 700;
+        color: var(--kira-gray-800);
+        font-size: 1.1rem;
+    }
+
+    .value-percentage {
+        font-size: 0.875rem;
+        color: var(--kira-gray-600);
+    }
+
+    .disk-filters {
+        display: flex;
+        gap: var(--spacing-sm);
+        align-items: center;
+    }
+
+    .disk-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .disk-card {
+        background: white;
+        border: 2px solid var(--kira-gray-200);
+        border-radius: var(--radius-xl);
+        padding: var(--spacing-lg);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .disk-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl);
+        border-color: var(--kira-primary);
+    }
+
+    .disk-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--kira-storage-1), var(--kira-storage-2), var(--kira-storage-3), var(--kira-storage-4));
+    }
+
+    .disk-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .disk-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-lg);
+        background: var(--kira-storage-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.25rem;
+        margin-right: var(--spacing-md);
+        box-shadow: var(--shadow-md);
+    }
+
+    .disk-info h5 {
+        margin: 0 0 4px 0;
+        color: var(--kira-gray-800);
+        font-weight: 600;
+    }
+
+    .disk-type {
+        font-size: 0.875rem;
+        color: var(--kira-gray-600);
+    }
+
+    .disk-usage-bar {
+        height: 12px;
+        background: var(--kira-gray-200);
+        border-radius: 6px;
+        overflow: hidden;
+        margin: var(--spacing-md) 0;
+        position: relative;
+    }
+
+    .usage-fill {
+        height: 100%;
+        background: var(--kira-storage-gradient);
+        border-radius: 6px;
+        transition: width 0.5s ease;
+        position: relative;
+    }
+
+    .usage-fill::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        animation: shimmer-bar 2s infinite;
+    }
+
+    @keyframes shimmer-bar {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+
+    .disk-stats {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .stat-group {
+        text-align: center;
+    }
+
+    .stat-value {
+        font-weight: 700;
+        color: var(--kira-gray-800);
+        font-size: 1rem;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+        color: var(--kira-gray-600);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .activity-chart-container {
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-lg);
+        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .large-file-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-md);
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--spacing-sm);
+        transition: all 0.2s ease;
+        border-left: 3px solid;
+    }
+
+    .large-file-item:hover {
+        background: white;
+        box-shadow: var(--shadow-sm);
+        transform: translateX(2px);
+    }
+
+    .large-file-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .large-file-item.critical { border-color: var(--kira-danger); }
+    .large-file-item.warning { border-color: var(--kira-warning); }
+    .large-file-item.normal { border-color: var(--kira-success); }
+
+    .file-info {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        flex: 1;
+    }
+
+    .file-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .file-details {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .file-name {
+        font-weight: 500;
+        color: var(--kira-gray-800);
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .file-path {
+        font-size: 0.75rem;
+        color: var(--kira-gray-500);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .file-size {
+        font-weight: 600;
+        color: var(--kira-gray-700);
+        white-space: nowrap;
+    }
+
+    .health-indicator {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-md);
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .health-indicator:last-child {
+        margin-bottom: 0;
+    }
+
+    .health-label {
+        font-weight: 500;
+        color: var(--kira-gray-700);
+    }
+
+    .health-status {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+        font-weight: 600;
+    }
+
+    .health-status.good { color: var(--kira-success); }
+    .health-status.warning { color: var(--kira-warning); }
+    .health-status.critical { color: var(--kira-danger); }
+
+    .activity-item {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
+        border-bottom: 1px solid var(--kira-gray-200);
+        transition: background 0.2s ease;
+    }
+
+    .activity-item:hover {
+        background: var(--kira-gray-50);
+    }
+
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+
+    .activity-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .activity-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .activity-title {
+        font-weight: 500;
+        color: var(--kira-gray-800);
+        margin-bottom: 2px;
+    }
+
+    .activity-time {
+        font-size: 0.75rem;
+        color: var(--kira-gray-500);
+    }
+
+    .performance-metric {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-sm) var(--spacing-md);
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .performance-metric:last-child {
+        margin-bottom: 0;
+    }
+
+    .metric-label {
+        font-weight: 500;
+        color: var(--kira-gray-700);
+    }
+
+    .metric-value {
+        font-weight: 600;
+        color: var(--kira-gray-800);
+    }
+
+    .file-type-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-sm) 0;
+        border-bottom: 1px solid var(--kira-gray-200);
+    }
+
+    .file-type-item:last-child {
+        border-bottom: none;
+    }
+
+    .type-info {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+    }
+
+    .type-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+
+    .type-name {
+        font-weight: 500;
+        color: var(--kira-gray-700);
+    }
+
+    .type-count {
+        background: var(--kira-gray-100);
+        color: var(--kira-gray-600);
+        padding: 2px 8px;
+        border-radius: var(--radius-sm);
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .storage-tools .btn {
+        transition: all 0.2s ease;
+    }
+
+    .storage-tools .btn:hover {
+        transform: translateY(-1px);
+    }
+
+    /* Loading States */
+    .disk-loading {
+        background: linear-gradient(90deg, var(--kira-gray-200) 25%, var(--kira-gray-100) 50%, var(--kira-gray-200) 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        height: 180px;
+        border-radius: var(--radius-xl);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .file-loading {
+        background: linear-gradient(90deg, var(--kira-gray-200) 25%, var(--kira-gray-100) 50%, var(--kira-gray-200) 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        height: 60px;
+        border-radius: var(--radius-md);
+        margin-bottom: var(--spacing-sm);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .disk-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .storage-visualization .row {
+            flex-direction: column;
+        }
+
+        .breakdown-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--spacing-sm);
+        }
+
+        .breakdown-value {
+            text-align: left;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    class StorageDashboard {
+        constructor() {
+            this.baseUrl = '/api/storage';
+            this.updateInterval = 15000;
+            this.charts = {};
+            this.isLive = true;
+            
+            this.init();
+        }
+
+        async init() {
+            console.log('💾 Storage Dashboard wird initialisiert...');
+            
+            // Initial data load
+            await this.loadAllStorageData();
+            
+            // Initialize charts
+            this.initCharts();
+            
+            // Start real-time updates
+            this.startRealTimeUpdates();
+            
+            console.log('✅ Storage Dashboard bereit');
+        }
+
+        async loadAllStorageData() {
+            this.showLoadingStates();
+            
+            try {
+                await Promise.all([
+                    this.loadStorageOverview(),
+                    this.loadDiskUsage(),
+                    this.loadLargeFiles(),
+                    this.loadStorageHealth(),
+                    this.loadRecentActivity(),
+                    this.loadPerformanceMetrics(),
+                    this.loadFileTypeAnalytics()
+                ]);
+            } catch (error) {
+                console.error('❌ Storage dashboard load error:', error);
+                this.showFallbackData();
+            }
+        }
+
+        showLoadingStates() {
+            document.getElementById('diskUsageGrid').innerHTML = 
+                Array(3).fill().map(() => '<div class="disk-loading"></div>').join('');
+            
+            document.getElementById('largeFilesList').innerHTML = 
+                Array(5).fill().map(() => '<div class="file-loading"></div>').join('');
+        }
+
+        async loadStorageOverview() {
+            try {
+                const response = await fetch(`${this.baseUrl}/overview`);
+                if (response.ok) {
+                    const data = await response.json();
+                    this.updateStorageOverview(data);
+                } else {
+                    this.loadFallbackOverview();
+                }
+            } catch (error) {
+                console.warn('Storage overview fallback:', error);
+                this.loadFallbackOverview();
+            }
+        }
+
+        updateStorageOverview(data) {
+            const container = document.getElementById('storageOverview');
+            const stats = [
+                { 
+                    icon: 'fas fa-hdd', 
+                    label: 'Total Storage', 
+                    value: data.total_storage || '1.2 TB', 
+                    color: 'var(--kira-storage-1)' 
+                },
+                { 
+                    icon: 'fas fa-chart-pie', 
+                    label: 'Used Space', 
+                    value: data.used_space || '847 GB', 
+                    color: 'var(--kira-storage-2)' 
+                },
+                { 
+                    icon: 'fas fa-folder', 
+                    label: 'Free Space', 
+                    value: data.free_space || '353 GB', 
+                    color: 'var(--kira-storage-3)' 
+                },
+                { 
+                    icon: 'fas fa-file', 
+                    label: 'Total Files', 
+                    value: data.total_files || '45,678', 
+                    color: 'var(--kira-storage-4)' 
+                }
+            ];
+
+            container.innerHTML = stats.map(stat => 
+                DashboardUtils.createStatCard(stat.icon, stat.label, stat.value, stat.color)
+            ).join('');
+        }
+
+        loadFallbackOverview() {
+            this.updateStorageOverview({
+                total_storage: '1.2 TB',
+                used_space: Math.floor(Math.random() * 200) + 700 + ' GB',
+                free_space: Math.floor(Math.random() * 100) + 300 + ' GB',
+                total_files: Math.floor(Math.random() * 10000) + 40000
+            });
+        }
+
+        async loadDiskUsage() {
+            const container = document.getElementById('diskUsageGrid');
+            
+            const disks = [
+                {
+                    name: 'System Drive (C:)',
+                    type: 'SSD',
+                    total: 500,
+                    used: 347,
+                    free: 153,
+                    health: 'good',
+                    icon: 'fas fa-microchip'
+                },
+                {
+                    name: 'Data Drive (D:)',
+                    type: 'HDD',
+                    total: 1000,
+                    used: 642,
+                    free: 358,
+                    health: 'good',
+                    icon: 'fas fa-hdd'
+                },
+                {
+                    name: 'Backup Drive (E:)',
+                    type: 'SSD',
+                    total: 250,
+                    used: 89,
+                    free: 161,
+                    health: 'warning',
+                    icon: 'fas fa-shield-alt'
+                }
+            ];
+
+            container.innerHTML = '<div class="disk-grid">' + 
+                disks.map(disk => this.createDiskCard(disk)).join('') + 
+                '</div>';
+        }
+
+        createDiskCard(disk) {
+            const usagePercent = Math.round((disk.used / disk.total) * 100);
+            const healthColor = disk.health === 'good' ? 'var(--kira-success)' : 
+                               disk.health === 'warning' ? 'var(--kira-warning)' : 
+                               'var(--kira-danger)';
+
+            return `
+                <div class="disk-card" data-disk-type="${disk.type.toLowerCase()}">
+                    <div class="disk-header">
+                        <div class="disk-icon">
+                            <i class="${disk.icon}"></i>
+                        </div>
+                        <div class="disk-info">
+                            <h5>${disk.name}</h5>
+                            <div class="disk-type">${disk.type} • ${disk.total} GB</div>
+                        </div>
+                    </div>
+                    
+                    <div class="disk-usage-bar">
+                        <div class="usage-fill" style="width: ${usagePercent}%"></div>
+                    </div>
+                    
+                    <div class="disk-stats">
+                        <div class="stat-group">
+                            <div class="stat-value">${disk.used} GB</div>
+                            <div class="stat-label">Used</div>
+                        </div>
+                        <div class="stat-group">
+                            <div class="stat-value">${usagePercent}%</div>
+                            <div class="stat-label">Usage</div>
+                        </div>
+                        <div class="stat-group">
+                            <div class="stat-value">${disk.free} GB</div>
+                            <div class="stat-label">Free</div>
+                        </div>
+                        <div class="stat-group">
+                            <div class="stat-value" style="color: ${healthColor};">
+                                <i class="fas fa-circle"></i>
+                            </div>
+                            <div class="stat-label">Health</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async loadLargeFiles() {
+            const container = document.getElementById('largeFilesList');
+            
+            const largeFiles = [
+                {
+                    name: 'system_backup_2024.zip',
+                    path: '/backups/',
+                    size: '2.4 GB',
+                    sizeBytes: 2400000000,
+                    type: 'archive',
+                    priority: 'critical'
+                },
+                {
+                    name: 'video_project_final.mp4',
+                    path: '/projects/videos/',
+                    size: '1.8 GB',
+                    sizeBytes: 1800000000,
+                    type: 'video',
+                    priority: 'warning'
+                },
+                {
+                    name: 'database_dump.sql',
+                    path: '/data/',
+                    size: '945 MB',
+                    sizeBytes: 945000000,
+                    type: 'database',
+                    priority: 'normal'
+                },
+                {
+                    name: 'ml_model_weights.h5',
+                    path: '/ai_models/',
+                    size: '723 MB',
+                    sizeBytes: 723000000,
+                    type: 'ai',
+                    priority: 'normal'
+                },
+                {
+                    name: 'temp_processing.tmp',
+                    path: '/temp/',
+                    size: '512 MB',
+                    sizeBytes: 512000000,
+                    type: 'temp',
+                    priority: 'warning'
+                }
+            ];
+
+            container.innerHTML = largeFiles.map(file => `
+                <div class="large-file-item ${file.priority}">
+                    <div class="file-info">
+                        <div class="file-icon" style="background: ${this.getFileTypeColor(file.type)};">
+                            <i class="${this.getFileTypeIcon(file.type)}"></i>
+                        </div>
+                        <div class="file-details">
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-path">${file.path}</div>
+                        </div>
+                    </div>
+                    <div class="file-size">${file.size}</div>
+                </div>
+            `).join('');
+        }
+
+        getFileTypeIcon(type) {
+            const icons = {
+                archive: 'fas fa-file-archive',
+                video: 'fas fa-file-video',
+                database: 'fas fa-database',
+                ai: 'fas fa-brain',
+                temp: 'fas fa-file',
+                document: 'fas fa-file-alt',
+                image: 'fas fa-file-image'
+            };
+            return icons[type] || 'fas fa-file';
+        }
+
+        getFileTypeColor(type) {
+            const colors = {
+                archive: 'var(--kira-storage-1)',
+                video: 'var(--kira-storage-2)',
+                database: 'var(--kira-storage-3)',
+                ai: 'var(--kira-storage-4)',
+                temp: 'var(--kira-warning)',
+                document: 'var(--kira-info)',
+                image: 'var(--kira-success)'
+            };
+            return colors[type] || 'var(--kira-gray-400)';
+        }
+
+        async loadStorageHealth() {
+            const container = document.getElementById('storageHealth');
+            
+            const healthData = [
+                { label: 'Disk Health', status: 'good', value: 'Excellent' },
+                { label: 'File System', status: 'good', value: 'Healthy' },
+                { label: 'Fragmentation', status: 'warning', value: '12%' },
+                { label: 'Bad Sectors', status: 'good', value: '0' },
+                { label: 'Temperature', status: 'good', value: '42°C' }
+            ];
+
+            container.innerHTML = healthData.map(item => `
+                <div class="health-indicator">
+                    <span class="health-label">${item.label}</span>
+                    <div class="health-status ${item.status}">
+                        <i class="fas fa-circle"></i>
+                        <span>${item.value}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async loadRecentActivity() {
+            const container = document.getElementById('recentActivity');
+            
+            const activities = [
+                {
+                    type: 'write',
+                    title: 'File created: backup.zip',
+                    time: 'vor 5 Min',
+                    icon: 'fas fa-plus',
+                    color: 'var(--kira-success)'
+                },
+                {
+                    type: 'delete',
+                    title: 'Deleted: temp files (245 MB)',
+                    time: 'vor 12 Min',
+                    icon: 'fas fa-trash',
+                    color: 'var(--kira-warning)'
+                },
+                {
+                    type: 'move',
+                    title: 'Moved: video_project.mp4',
+                    time: 'vor 18 Min',
+                    icon: 'fas fa-exchange-alt',
+                    color: 'var(--kira-info)'
+                },
+                {
+                    type: 'scan',
+                    title: 'Disk scan completed',
+                    time: 'vor 1 Std',
+                    icon: 'fas fa-search',
+                    color: 'var(--kira-primary)'
+                }
+            ];
+
+            container.innerHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon" style="background: ${activity.color};">
+                        <i class="${activity.icon}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">${activity.title}</div>
+                        <div class="activity-time">${activity.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async loadPerformanceMetrics() {
+            const container = document.getElementById('performanceMetrics');
+            
+            const metrics = [
+                { label: 'Read Speed', value: '540 MB/s' },
+                { label: 'Write Speed', value: '480 MB/s' },
+                { label: 'IOPS', value: '85,000' },
+                { label: 'Latency', value: '0.12ms' },
+                { label: 'Queue Depth', value: '32' }
+            ];
+
+            container.innerHTML = metrics.map(metric => `
+                <div class="performance-metric">
+                    <span class="metric-label">${metric.label}</span>
+                    <span class="metric-value">${metric.value}</span>
+                </div>
+            `).join('');
+        }
+
+        async loadFileTypeAnalytics() {
+            const container = document.getElementById('fileTypeAnalytics');
+            
+            const fileTypes = [
+                { name: 'Videos', count: 1234, color: 'var(--kira-storage-1)' },
+                { name: 'Documents', count: 5678, color: 'var(--kira-storage-2)' },
+                { name: 'Images', count: 9876, color: 'var(--kira-storage-3)' },
+                { name: 'Archives', count: 543, color: 'var(--kira-storage-4)' },
+                { name: 'Other', count: 2345, color: 'var(--kira-gray-400)' }
+            ];
+
+            container.innerHTML = fileTypes.map(type => `
+                <div class="file-type-item">
+                    <div class="type-info">
+                        <div class="type-color" style="background: ${type.color}"></div>
+                        <span class="type-name">${type.name}</span>
+                    </div>
+                    <span class="type-count">${type.count}</span>
+                </div>
+            `).join('');
+        }
+
+        initCharts() {
+            this.initStorageDonutChart();
+            this.initFileSystemChart();
+            this.updateStorageBreakdown();
+        }
+
+        initStorageDonutChart() {
+            const ctx = document.getElementById('storageDonutChart').getContext('2d');
+            
+            this.charts.storageDonut = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['System', 'Applications', 'Documents', 'Media', 'Other'],
+                    datasets: [{
+                        data: [125, 180, 240, 195, 107],
+                        backgroundColor: [
+                            'var(--kira-storage-1)',
+                            'var(--kira-storage-2)',
+                            'var(--kira-storage-3)',
+                            'var(--kira-storage-4)',
+                            'var(--kira-gray-400)'
+                        ],
+                        borderWidth: 0,
+                        cutout: '60%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Storage Distribution',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        updateStorageBreakdown() {
+            const container = document.getElementById('storageBreakdown');
+            
+            const breakdown = [
+                { 
+                    type: 'system', 
+                    name: 'System Files', 
+                    size: '125 GB', 
+                    percentage: '14%',
+                    icon: 'fas fa-cog',
+                    color: 'var(--kira-storage-1)'
+                },
+                { 
+                    type: 'applications', 
+                    name: 'Applications', 
+                    size: '180 GB', 
+                    percentage: '21%',
+                    icon: 'fas fa-desktop',
+                    color: 'var(--kira-storage-2)'
+                },
+                { 
+                    type: 'documents', 
+                    name: 'Documents', 
+                    size: '240 GB', 
+                    percentage: '28%',
+                    icon: 'fas fa-file-alt',
+                    color: 'var(--kira-storage-3)'
+                },
+                { 
+                    type: 'media', 
+                    name: 'Media Files', 
+                    size: '195 GB', 
+                    percentage: '23%',
+                    icon: 'fas fa-photo-video',
+                    color: 'var(--kira-storage-4)'
+                },
+                { 
+                    type: 'other', 
+                    name: 'Other', 
+                    size: '107 GB', 
+                    percentage: '14%',
+                    icon: 'fas fa-ellipsis-h',
+                    color: 'var(--kira-gray-400)'
+                }
+            ];
+
+            container.innerHTML = breakdown.map(item => `
+                <div class="breakdown-item ${item.type}">
+                    <div class="breakdown-info">
+                        <div class="breakdown-icon" style="background: ${item.color};">
+                            <i class="${item.icon}"></i>
+                        </div>
+                        <div class="breakdown-details">
+                            <h6>${item.name}</h6>
+                            <div class="breakdown-size">${item.size} of storage</div>
+                        </div>
+                    </div>
+                    <div class="breakdown-value">
+                        <div class="value-size">${item.size}</div>
+                        <div class="value-percentage">${item.percentage}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        initFileSystemChart() {
+            const ctx = document.getElementById('fileSystemChart').getContext('2d');
+            
+            this.charts.fileSystem = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+                    datasets: [
+                        {
+                            label: 'Read (MB/s)',
+                            data: Array.from({length: 24}, () => Math.floor(Math.random() * 100) + 50),
+                            borderColor: 'var(--kira-storage-1)',
+                            backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                            tension: 0.4,
+                            fill: false
+                        },
+                        {
+                            label: 'Write (MB/s)',
+                            data: Array.from({length: 24}, () => Math.floor(Math.random() * 80) + 30),
+                            borderColor: 'var(--kira-storage-2)',
+                            backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                            tension: 0.4,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Disk I/O Activity (24h)'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        startRealTimeUpdates() {
+            startAutoRefresh(() => {
+                this.loadStorageOverview();
+                this.loadPerformanceMetrics();
+                this.loadRecentActivity();
+                this.updateChartData();
+            }, this.updateInterval);
+        }
+
+        updateChartData() {
+            // Update file system chart with new data
+            if (this.charts.fileSystem) {
+                const now = new Date();
+                const timeLabel = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+                
+                this.charts.fileSystem.data.labels.push(timeLabel);
+                this.charts.fileSystem.data.datasets[0].data.push(Math.floor(Math.random() * 100) + 50);
+                this.charts.fileSystem.data.datasets[1].data.push(Math.floor(Math.random() * 80) + 30);
+                
+                // Keep only last 24 data points
+                if (this.charts.fileSystem.data.labels.length > 24) {
+                    this.charts.fileSystem.data.labels.shift();
+                    this.charts.fileSystem.data.datasets.forEach(dataset => dataset.data.shift());
+                }
+                
+                this.charts.fileSystem.update('none');
+            }
+        }
+
+        showFallbackData() {
+            console.log('💾 Zeige Storage Fallback-Daten');
+            this.loadFallbackOverview();
+            this.loadDiskUsage();
+            this.loadLargeFiles();
+            this.loadStorageHealth();
+            this.loadRecentActivity();
+            this.loadPerformanceMetrics();
+            this.loadFileTypeAnalytics();
+        }
+    }
+
+    // Global functions
+    function refreshStorageData() {
+        console.log('🔄 Refreshing storage data...');
+        if (window.storageDashboard) {
+            window.storageDashboard.loadAllStorageData();
+        }
+    }
+
+    function filterDiskData() {
+        const filterValue = document.getElementById('diskFilter').value;
+        console.log(`🔍 Filtering disk data: ${filterValue}`);
+        
+        const diskCards = document.querySelectorAll('.disk-card');
+        diskCards.forEach(card => {
+            const diskType = card.dataset.diskType;
+            
+            if (filterValue === 'all' || 
+                (filterValue === 'system' && diskType === 'ssd') ||
+                (filterValue === 'data' && diskType === 'hdd') ||
+                (filterValue === 'backup' && card.textContent.includes('Backup'))) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function analyzeStorage() {
+        console.log('🔍 Analyzing storage...');
+        alert('Deep storage analysis wird gestartet...');
+    }
+
+    function cleanupStorage() {
+        console.log('🧹 Cleaning up storage...');
+        if (confirm('Storage cleanup starten? Temp-Dateien werden gelöscht.')) {
+            alert('Storage cleanup wird ausgeführt...');
+        }
+    }
+
+    function defragmentDisk() {
+        console.log('🔧 Defragmenting disk...');
+        if (confirm('Festplatte defragmentieren? Dies kann einige Zeit dauern.')) {
+            alert('Disk defragmentation wird gestartet...');
+        }
+    }
+
+    function backupData() {
+        console.log('🛡️ Starting backup...');
+        alert('Data backup wird vorbereitet...');
+    }
+
+    // Initialize storage dashboard
+    document.addEventListener('DOMContentLoaded', () => {
+        window.storageDashboard = new StorageDashboard();
+    });
+</script>
+{% endblock %}

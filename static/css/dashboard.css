@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Kira Chat Dashboard{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="text-kira-primary">Chat Dashboard</h1>
+    <div class="kira-chat-widget" id="kiraChatWidget">
+        <!-- Chat Toggle Button -->
+        <button class="kira-chat-toggle" id="kiraChatToggle" onclick="toggleKiraChat()">
+            <i class="fas fa-comments" id="chatToggleIcon"></i>
+        </button>
+        <!-- Chat Window -->
+        <div class="kira-chat-window" id="kiraChatWindow">
+            <!-- Chat Header -->
+            <div class="kira-chat-header">
+                <div class="kira-avatar-container">
+                    <div class="kira-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="kira-info">
+                        <h6>Kira AI Assistant</h6>
+                        <div class="kira-status">
+                            <span class="activity-pulse"></span>
+                            <span id="kiraStatusText">Online & Ready</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-controls">
+                    <button class="chat-control-btn" onclick="minimizeKiraChat()" title="Minimize">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button class="chat-control-btn" onclick="closeKiraChat()" title="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Chat Messages -->
+            <div class="kira-chat-messages" id="kiraChatMessages"></div>
+            <!-- Chat Input -->
+            <div class="kira-chat-input">
+                <div class="chat-input-group">
+                    <textarea class="chat-input-field" id="kiraChatInput" placeholder="Type a message..." rows="1"></textarea>
+                    <button class="chat-send-btn" id="chatSendBtn" onclick="sendKiraMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

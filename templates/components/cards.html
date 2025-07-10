@@ -1,0 +1,267 @@
+<!-- Modern Card Components Library -->
+
+{% macro stat_card(icon, title, value, color="var(--kira-primary)", trend=None) %}
+<div class="modern-stat-card">
+    <div class="stat-icon" style="background: {{ color }};">
+        <i class="{{ icon }}"></i>
+    </div>
+    <div class="stat-content">
+        <div class="stat-value">{{ value }}</div>
+        <div class="stat-title">{{ title }}</div>
+        {% if trend %}
+            <div class="stat-trend {{ 'positive' if trend.value > 0 else 'negative' }}">
+                <i class="fas fa-arrow-{{ 'up' if trend.value > 0 else 'down' }}"></i>
+                {{ trend.value }}% {{ trend.period }}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.modern-stat-card {
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    border: 1px solid var(--kira-gray-200);
+    position: relative;
+    overflow: hidden;
+}
+
+.modern-stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+.modern-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--kira-gradient);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modern-stat-card:hover::before {
+    opacity: 1;
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-md);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--kira-gray-800);
+    margin-bottom: var(--spacing-xs);
+}
+
+.stat-title {
+    color: var(--kira-gray-600);
+    font-size: 0.9rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.stat-trend {
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.stat-trend.positive {
+    color: var(--kira-success);
+}
+
+.stat-trend.negative {
+    color: var(--kira-danger);
+}
+</style>
+{% endmacro %}
+
+{% macro info_card(title, content, icon=None, color="var(--kira-primary)", actions=[]) %}
+<div class="modern-info-card">
+    <div class="card-header">
+        {% if icon %}
+            <div class="card-icon" style="background: {{ color }};">
+                <i class="{{ icon }}"></i>
+            </div>
+        {% endif %}
+        <h5 class="card-title">{{ title }}</h5>
+        {% if actions %}
+            <div class="card-actions">
+                {% for action in actions %}
+                    <button class="action-btn" onclick="{{ action.onclick }}" title="{{ action.title }}">
+                        <i class="{{ action.icon }}"></i>
+                    </button>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div class="card-content">
+        {{ content }}
+    </div>
+</div>
+
+<style>
+.modern-info-card {
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--kira-gray-200);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.modern-info-card:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--kira-gray-100);
+    background: var(--kira-gray-50);
+}
+
+.card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+}
+
+.card-title {
+    flex: 1;
+    margin: 0;
+    color: var(--kira-gray-800);
+    font-weight: 600;
+}
+
+.card-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.action-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: var(--kira-gray-500);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-btn:hover {
+    background: var(--kira-primary);
+    color: white;
+}
+
+.card-content {
+    padding: var(--spacing-lg);
+}
+</style>
+{% endmacro %}
+
+{% macro metric_card(title, metrics, chart_id=None) %}
+<div class="modern-metric-card">
+    <div class="metric-header">
+        <h6 class="metric-title">{{ title }}</h6>
+        {% if chart_id %}
+            <div class="metric-chart">
+                <canvas id="{{ chart_id }}" width="100" height="50"></canvas>
+            </div>
+        {% endif %}
+    </div>
+    <div class="metric-list">
+        {% for metric in metrics %}
+            <div class="metric-item">
+                <span class="metric-label">{{ metric.label }}</span>
+                <span class="metric-value" style="color: {{ metric.color or 'var(--kira-gray-700)' }};">
+                    {{ metric.value }}
+                </span>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.modern-metric-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    border: 1px solid var(--kira-gray-200);
+    transition: all 0.2s ease;
+}
+
+.modern-metric-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.metric-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.metric-title {
+    margin: 0;
+    color: var(--kira-gray-700);
+    font-weight: 600;
+}
+
+.metric-chart {
+    width: 80px;
+    height: 40px;
+}
+
+.metric-list {
+    display: grid;
+    gap: var(--spacing-sm);
+}
+
+.metric-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) 0;
+}
+
+.metric-label {
+    color: var(--kira-gray-600);
+    font-size: 0.875rem;
+}
+
+.metric-value {
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+</style>
+{% endmacro %}

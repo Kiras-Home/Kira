@@ -1,0 +1,12 @@
+cryptography
+numpy
+librosa
+flask-sock
+fastapi
+uvicorn
+python-multipart
+psutil
+pvporcupine
+customtkinter
+Pillow
+matplotlib

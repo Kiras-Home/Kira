@@ -1,0 +1,101 @@
+<!-- Modern Navigation wird bereits in base.html definiert -->
+<!-- Hier können zusätzliche Navigation-Komponenten definiert werden -->
+
+<!-- Breadcrumb Component -->
+{% macro breadcrumb(items) %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb modern-breadcrumb">
+        {% for item in items %}
+        <li class="breadcrumb-item{% if loop.last %} active{% endif %}">
+            {% if not loop.last %}
+            <a href="{{ item.url }}">
+                {% if item.icon %}<i class="{{ item.icon }} me-1"></i>{% endif %}
+                {{ item.title }}
+            </a>
+            {% else %}
+            {% if item.icon %}<i class="{{ item.icon }} me-1"></i>{% endif %}
+            {{ item.title }}
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ol>
+</nav>
+
+<style>
+.modern-breadcrumb {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.modern-breadcrumb .breadcrumb-item a {
+    color: var(--kira-primary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.modern-breadcrumb .breadcrumb-item a:hover {
+    color: var(--kira-primary-dark);
+}
+
+.modern-breadcrumb .breadcrumb-item.active {
+    color: var(--kira-gray-600);
+}
+</style>
+{% endmacro %}
+
+<!-- Tab Navigation Component -->
+{% macro tab_navigation(tabs, active_tab) %}
+<div class="modern-tabs">
+    <ul class="nav nav-tabs" role="tablist">
+        {% for tab in tabs %}
+        <li class="nav-item" role="presentation">
+            <button class="nav-link{% if tab.id == active_tab %} active{% endif %}" 
+                    id="{{ tab.id }}-tab" 
+                    data-bs-toggle="tab" 
+                    data-bs-target="#{{ tab.id }}" 
+                    type="button" 
+                    role="tab">
+                {% if tab.icon %}<i class="{{ tab.icon }} me-2"></i>{% endif %}
+                {{ tab.title }}
+                {% if tab.badge %}
+                <span class="badge bg-primary ms-2">{{ tab.badge }}</span>
+                {% endif %}
+            </button>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<style>
+.modern-tabs .nav-tabs {
+    border-bottom: 2px solid var(--kira-gray-200);
+    margin-bottom: var(--spacing-xl);
+}
+
+.modern-tabs .nav-link {
+    border: none;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    color: var(--kira-gray-600);
+    font-weight: 500;
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin-bottom: -2px;
+    transition: all 0.3s ease;
+}
+
+.modern-tabs .nav-link:hover {
+    background: var(--kira-gray-50);
+    color: var(--kira-primary);
+}
+
+.modern-tabs .nav-link.active {
+    background: white;
+    color: var(--kira-primary);
+    border-bottom: 2px solid var(--kira-primary);
+    box-shadow: var(--shadow-md);
+}
+</style>
+{% endmacro %}

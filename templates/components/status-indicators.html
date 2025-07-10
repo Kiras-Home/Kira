@@ -1,0 +1,412 @@
+<!-- Modern Status Indicators & Notifications -->
+
+{% macro status_indicator(status, label, icon=None, size="md") %}
+<div class="status-indicator status-{{ status }} size-{{ size }}">
+    {% if icon %}
+        <i class="{{ icon }} status-icon"></i>
+    {% endif %}
+    <div class="status-dot"></div>
+    {% if label %}
+        <span class="status-label">{{ label }}</span>
+    {% endif %}
+</div>
+
+<style>
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    position: relative;
+}
+
+.size-sm .status-dot { width: 6px; height: 6px; }
+.size-lg .status-dot { width: 12px; height: 12px; }
+
+.status-online .status-dot {
+    background: var(--kira-success);
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+
+.status-offline .status-dot {
+    background: var(--kira-gray-400);
+}
+
+.status-busy .status-dot {
+    background: var(--kira-danger);
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.status-away .status-dot {
+    background: var(--kira-warning);
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+.status-online .status-dot::after,
+.status-busy .status-dot::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150%;
+    height: 150%;
+    border-radius: 50%;
+    background: inherit;
+    opacity: 0.3;
+    animation: statusPulse 2s infinite;
+}
+
+@keyframes statusPulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0.3;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0;
+    }
+}
+
+.status-online .status-label { color: var(--kira-success); }
+.status-offline .status-label { color: var(--kira-gray-500); }
+.status-busy .status-label { color: var(--kira-danger); }
+.status-away .status-label { color: var(--kira-warning); }
+</style>
+{% endmacro %}
+
+{% macro notification_toast(id, type="info", title, message, actions=[], auto_dismiss=true) %}
+<div class="notification-toast toast-{{ type }}" id="{{ id }}" data-auto-dismiss="{{ auto_dismiss }}">
+    <div class="toast-icon">
+        {% if type == "success" %}
+            <i class="fas fa-check-circle"></i>
+        {% elif type == "error" %}
+            <i class="fas fa-exclamation-circle"></i>
+        {% elif type == "warning" %}
+            <i class="fas fa-exclamation-triangle"></i>
+        {% else %}
+            <i class="fas fa-info-circle"></i>
+        {% endif %}
+    </div>
+    <div class="toast-content">
+        <div class="toast-title">{{ title }}</div>
+        <div class="toast-message">{{ message }}</div>
+        {% if actions %}
+            <div class="toast-actions">
+                {% for action in actions %}
+                    <button class="toast-action-btn" onclick="{{ action.onclick }}">
+                        {{ action.label }}
+                    </button>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <button class="toast-close" onclick="dismissToast('{{ id }}')">
+        <i class="fas fa-times"></i>
+    </button>
+    {% if auto_dismiss %}
+        <div class="toast-progress"></div>
+    {% endif %}
+</div>
+
+<style>
+.notification-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 320px;
+    max-width: 400px;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    border: 1px solid var(--kira-gray-200);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    z-index: 10000;
+    animation: slideInRight 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.toast-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.toast-success .toast-icon {
+    background: var(--kira-success);
+    color: white;
+}
+
+.toast-error .toast-icon {
+    background: var(--kira-danger);
+    color: white;
+}
+
+.toast-warning .toast-icon {
+    background: var(--kira-warning);
+    color: white;
+}
+
+.toast-info .toast-icon {
+    background: var(--kira-info);
+    color: white;
+}
+
+.toast-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.toast-title {
+    font-weight: 600;
+    color: var(--kira-gray-800);
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+}
+
+.toast-message {
+    color: var(--kira-gray-600);
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.toast-actions {
+    margin-top: var(--spacing-md);
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.toast-action-btn {
+    background: var(--kira-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toast-action-btn:hover {
+    background: var(--kira-primary-dark);
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: var(--kira-gray-400);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.toast-close:hover {
+    background: var(--kira-gray-100);
+    color: var(--kira-gray-600);
+}
+
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: var(--kira-primary);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    animation: toastProgress 5s linear forwards;
+}
+
+@keyframes toastProgress {
+    from {
+        width: 100%;
+    }
+    to {
+        width: 0%;
+    }
+}
+</style>
+
+<script>
+function dismissToast(id) {
+    const toast = document.getElementById(id);
+    if (toast) {
+        toast.style.animation = 'slideOutRight 0.3s ease forwards';
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }
+}
+
+// Auto-dismiss toasts
+document.addEventListener('DOMContentLoaded', () => {
+    const toasts = document.querySelectorAll('.notification-toast[data-auto-dismiss="true"]');
+    toasts.forEach(toast => {
+        setTimeout(() => {
+            dismissToast(toast.id);
+        }, 5000);
+    });
+});
+
+@keyframes slideOutRight {
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+</script>
+{% endmacro %}
+
+{% macro loading_spinner(size="md", color="var(--kira-primary)", label="") %}
+<div class="loading-spinner spinner-{{ size }}">
+    <div class="spinner" style="border-top-color: {{ color }};"></div>
+    {% if label %}
+        <div class="spinner-label">{{ label }}</div>
+    {% endif %}
+</div>
+
+<style>
+.loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.spinner {
+    border: 3px solid var(--kira-gray-200);
+    border-radius: 50%;
+    border-top: 3px solid var(--kira-primary);
+    animation: spin 1s linear infinite;
+}
+
+.spinner-sm .spinner {
+    width: 20px;
+    height: 20px;
+    border-width: 2px;
+}
+
+.spinner-md .spinner {
+    width: 32px;
+    height: 32px;
+}
+
+.spinner-lg .spinner {
+    width: 48px;
+    height: 48px;
+    border-width: 4px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.spinner-label {
+    color: var(--kira-gray-600);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+</style>
+{% endmacro %}
+
+{% macro progress_bar(percentage, label="", color="var(--kira-primary)", animated=false) %}
+<div class="progress-bar-container">
+    {% if label %}
+        <div class="progress-label">
+            <span>{{ label }}</span>
+            <span>{{ percentage }}%</span>
+        </div>
+    {% endif %}
+    <div class="progress-bar">
+        <div class="progress-fill{{ ' animated' if animated else '' }}" 
+             style="width: {{ percentage }}%; background: {{ color }};">
+            {% if animated %}
+                <div class="progress-shine"></div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.progress-bar-container {
+    width: 100%;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xs);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--kira-gray-700);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--kira-gray-200);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+    position: relative;
+}
+
+.progress-fill.animated::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: progressShine 2s infinite;
+}
+
+@keyframes progressShine {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+</style>
+{% endmacro %}

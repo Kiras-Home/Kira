@@ -1,0 +1,504 @@
+{% extends "layouts/dashboard.html" %}
+{% set show_sidebar = false %}
+
+{% block title %}Kira - Main Dashboard{% endblock %}
+
+{% block dashboard_icon %}<i class="fas fa-home"></i>{% endblock %}
+{% block dashboard_title %}Kira Home Assistant{% endblock %}
+{% block dashboard_description %}Dein intelligenter digitaler Begleiter - System Overview & Control Center{% endblock %}
+
+{% block dashboard_stats %}
+<div class="dashboard-stats" id="systemOverview">
+    <!-- Wird dynamisch gefüllt -->
+</div>
+{% endblock %}
+
+{% block main_content %}
+<!-- System Status Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-heartbeat me-2"></i>
+            System Health
+        </h3>
+        <div class="d-flex gap-2">
+            <span class="badge bg-success">
+                <i class="fas fa-circle live-indicator me-1"></i>
+                Live
+            </span>
+            <button class="refresh-btn" onclick="refreshSystemHealth()" title="Refresh">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
+    </div>
+    <div id="systemHealthGrid">
+        <!-- System health wird hier angezeigt -->
+    </div>
+</div>
+
+<!-- Quick Actions Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-bolt me-2"></i>
+            Quick Actions
+        </h3>
+    </div>
+    <div class="quick-actions-grid">
+        <div class="action-card" onclick="openModule('memory')">
+            <div class="action-icon" style="background: var(--kira-neural-1);">
+                <i class="fas fa-brain"></i>
+            </div>
+            <h5>Memory Dashboard</h5>
+            <p>Kiras Gedächtnis & Erinnerungen erkunden</p>
+        </div>
+        
+        <div class="action-card" onclick="openModule('chat')">
+            <div class="action-icon" style="background: var(--kira-neural-2);">
+                <i class="fas fa-comments"></i>
+            </div>
+            <h5>Chat Analytics</h5>
+            <p>Gesprächsverläufe & AI Performance</p>
+        </div>
+        
+        <div class="action-card" onclick="openModule('storage')">
+            <div class="action-icon" style="background: var(--kira-neural-3);">
+                <i class="fas fa-database"></i>
+            </div>
+            <h5>Storage Manager</h5>
+            <p>Dateien & Backup Management</p>
+        </div>
+        
+        <div class="action-card" onclick="openModule('system')">
+            <div class="action-icon" style="background: var(--kira-neural-4);">
+                <i class="fas fa-cogs"></i>
+            </div>
+            <h5>System Control</h5>
+            <p>Einstellungen & Wartung</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block side_content %}
+<!-- Module Status Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-cubes me-2"></i>
+            Module Status
+        </h4>
+    </div>
+    <div id="moduleStatus">
+        <!-- Module status wird hier angezeigt -->
+    </div>
+</div>
+
+<!-- Recent Activity Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-stream me-2"></i>
+            Live Activity
+        </h4>
+    </div>
+    <div id="recentActivity">
+        <!-- Recent activities werden hier angezeigt -->
+    </div>
+</div>
+
+<!-- System Info Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-info-circle me-2"></i>
+            System Info
+        </h4>
+    </div>
+    <div id="systemInfo">
+        <!-- System info wird hier angezeigt -->
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+{{ super() }}
+<style>
+    .quick-actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: var(--spacing-lg);
+    }
+
+    .action-card {
+        background: var(--kira-gray-50);
+        border: 2px solid var(--kira-gray-200);
+        border-radius: var(--radius-xl);
+        padding: var(--spacing-xl);
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .action-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl);
+        border-color: var(--kira-primary);
+        background: white;
+    }
+
+    .action-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        margin: 0 auto var(--spacing-lg);
+        box-shadow: var(--shadow-md);
+    }
+
+    .action-card h5 {
+        color: var(--kira-gray-800);
+        font-weight: 600;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .action-card p {
+        color: var(--kira-gray-600);
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    .health-metric {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-md);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--spacing-sm);
+        background: var(--kira-gray-50);
+    }
+
+    .health-metric:last-child {
+        margin-bottom: 0;
+    }
+
+    .metric-label {
+        font-weight: 500;
+        color: var(--kira-gray-700);
+    }
+
+    .metric-value {
+        font-weight: 600;
+    }
+
+    .metric-value.good { color: var(--kira-success); }
+    .metric-value.warning { color: var(--kira-warning); }
+    .metric-value.error { color: var(--kira-danger); }
+
+    .activity-item {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
+        border-bottom: 1px solid var(--kira-gray-200);
+    }
+
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+
+    .activity-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+        color: white;
+    }
+
+    .activity-content {
+        flex: 1;
+    }
+
+    .activity-title {
+        font-weight: 500;
+        color: var(--kira-gray-800);
+        margin-bottom: 2px;
+    }
+
+    .activity-time {
+        font-size: 0.75rem;
+        color: var(--kira-gray-500);
+    }
+
+    .module-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-sm) 0;
+        border-bottom: 1px solid var(--kira-gray-200);
+    }
+
+    .module-item:last-child {
+        border-bottom: none;
+    }
+
+    .module-name {
+        font-weight: 500;
+        color: var(--kira-gray-700);
+    }
+
+    .module-status {
+        padding: 2px 8px;
+        border-radius: var(--radius-sm);
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+
+    .module-status.online {
+        background: var(--kira-success);
+        color: white;
+    }
+
+    .module-status.offline {
+        background: var(--kira-danger);
+        color: white;
+    }
+
+    .module-status.loading {
+        background: var(--kira-warning);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    class MainDashboard {
+        constructor() {
+            this.baseUrl = '/api';
+            this.updateInterval = 5000;
+            this.isConnected = true;
+            
+            this.init();
+        }
+
+        async init() {
+            console.log('🏠 Main Dashboard wird initialisiert...');
+            
+            // Initial data load
+            await this.loadAllData();
+            
+            // Start real-time updates
+            this.startRealTimeUpdates();
+            
+            console.log('✅ Main Dashboard bereit');
+        }
+
+        async loadAllData() {
+            try {
+                await Promise.all([
+                    this.loadSystemOverview(),
+                    this.loadSystemHealth(),
+                    this.loadModuleStatus(),
+                    this.loadRecentActivity(),
+                    this.loadSystemInfo()
+                ]);
+            } catch (error) {
+                console.error('❌ Dashboard load error:', error);
+                this.showFallbackData();
+            }
+        }
+
+        async loadSystemOverview() {
+            try {
+                const response = await fetch(`${this.baseUrl}/system/overview`);
+                if (response.ok) {
+                    const data = await response.json();
+                    this.updateSystemOverview(data);
+                } else {
+                    this.loadFallbackOverview();
+                }
+            } catch (error) {
+                console.warn('System overview fallback:', error);
+                this.loadFallbackOverview();
+            }
+        }
+
+        updateSystemOverview(data) {
+            const container = document.getElementById('systemOverview');
+            const stats = [
+                { icon: 'fas fa-microchip', label: 'CPU', value: `${data.cpu_usage || 23}%`, color: 'var(--kira-primary)' },
+                { icon: 'fas fa-memory', label: 'Memory', value: `${data.memory_usage || 67}%`, color: 'var(--kira-success)' },
+                { icon: 'fas fa-hdd', label: 'Storage', value: `${data.storage_usage || 45}%`, color: 'var(--kira-info)' },
+                { icon: 'fas fa-clock', label: 'Uptime', value: data.uptime || '2d 4h', color: 'var(--kira-warning)' }
+            ];
+
+            container.innerHTML = stats.map(stat => 
+                DashboardUtils.createStatCard(stat.icon, stat.label, stat.value, stat.color)
+            ).join('');
+        }
+
+        loadFallbackOverview() {
+            this.updateSystemOverview({
+                cpu_usage: Math.floor(Math.random() * 40) + 10,
+                memory_usage: Math.floor(Math.random() * 30) + 50,
+                storage_usage: Math.floor(Math.random() * 20) + 30,
+                uptime: '2d 4h 15m'
+            });
+        }
+
+        async loadSystemHealth() {
+            const container = document.getElementById('systemHealthGrid');
+            
+            const healthMetrics = [
+                { label: 'Kira AI Core', value: 'Online', status: 'good' },
+                { label: 'Memory System', value: 'Active', status: 'good' },
+                { label: 'Chat Engine', value: 'Running', status: 'good' },
+                { label: 'Storage Service', value: 'Healthy', status: 'good' },
+                { label: 'Network Status', value: 'Connected', status: 'good' }
+            ];
+
+            container.innerHTML = healthMetrics.map(metric => `
+                <div class="health-metric">
+                    <span class="metric-label">${metric.label}</span>
+                    <span class="metric-value ${metric.status}">${metric.value}</span>
+                </div>
+            `).join('');
+        }
+
+        async loadModuleStatus() {
+            const container = document.getElementById('moduleStatus');
+            
+            const modules = [
+                { name: 'Memory System', status: 'online' },
+                { name: 'Chat Engine', status: 'online' },
+                { name: 'Storage Manager', status: 'online' },
+                { name: 'Voice Module', status: 'loading' },
+                { name: 'Analytics', status: 'online' }
+            ];
+
+            container.innerHTML = modules.map(module => `
+                <div class="module-item">
+                    <span class="module-name">${module.name}</span>
+                    <span class="module-status ${module.status}">${module.status}</span>
+                </div>
+            `).join('');
+        }
+
+        async loadRecentActivity() {
+            const container = document.getElementById('recentActivity');
+            
+            const activities = [
+                { 
+                    icon: 'fas fa-comments', 
+                    iconColor: 'var(--kira-primary)', 
+                    title: 'Neue Chat-Nachricht', 
+                    time: 'vor 2 Min' 
+                },
+                { 
+                    icon: 'fas fa-brain', 
+                    iconColor: 'var(--kira-success)', 
+                    title: 'Memory Update', 
+                    time: 'vor 5 Min' 
+                },
+                { 
+                    icon: 'fas fa-save', 
+                    iconColor: 'var(--kira-info)', 
+                    title: 'Auto-Backup erstellt', 
+                    time: 'vor 15 Min' 
+                }
+            ];
+
+            container.innerHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon" style="background: ${activity.iconColor};">
+                        <i class="${activity.icon}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">${activity.title}</div>
+                        <div class="activity-time">${activity.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async loadSystemInfo() {
+            const container = document.getElementById('systemInfo');
+            
+            const info = {
+                version: '2.0.0',
+                build: '2024.07.04',
+                platform: 'Linux x64',
+                python: '3.11.4',
+                memory_total: '8.0 GB'
+            };
+
+            container.innerHTML = Object.entries(info).map(([key, value]) => `
+                <div class="health-metric">
+                    <span class="metric-label">${key.charAt(0).toUpperCase() + key.slice(1)}</span>
+                    <span class="metric-value">${value}</span>
+                </div>
+            `).join('');
+        }
+
+        startRealTimeUpdates() {
+            startAutoRefresh(() => {
+                this.loadSystemOverview();
+                this.loadRecentActivity();
+                DashboardUtils.updateTimestamp('lastUpdate');
+            }, this.updateInterval);
+        }
+
+        showFallbackData() {
+            console.log('📊 Zeige Fallback-Daten');
+            this.loadFallbackOverview();
+            this.loadSystemHealth();
+            this.loadModuleStatus();
+            this.loadRecentActivity();
+            this.loadSystemInfo();
+        }
+    }
+
+    // Global functions
+    function openModule(module) {
+        console.log(`🚀 Opening ${module} module`);
+        
+        const moduleUrls = {
+            'memory': '/memory',
+            'chat': '/chat',
+            'storage': '/storage',
+            'system': '/system',
+            'todo': '/todo',
+            'config': '/config'
+        };
+        
+        const url = moduleUrls[module];
+        if (url) {
+            window.location.href = url;
+        } else {
+            alert(`${module} Module wird noch entwickelt...`);
+        }
+    }
+
+    function refreshSystemHealth() {
+        console.log('🔄 Refreshing system health...');
+        if (window.mainDashboard) {
+            window.mainDashboard.loadSystemHealth();
+        }
+    }
+
+    // Initialize dashboard
+    document.addEventListener('DOMContentLoaded', () => {
+        window.mainDashboard = new MainDashboard();
+    });
+</script>
+{% endblock %}

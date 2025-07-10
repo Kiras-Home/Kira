@@ -1,0 +1,74 @@
+2025-07-09 23:21:01,952 | INFO | __init__:51 | 🔍 Memory Debug Logger initialized: logs/debug/BrainLikeMemorySystem_debug_20250709.log
+2025-07-09 23:22:22,571 | INFO | __init__:51 | 🔍 Memory Debug Logger initialized: logs/debug/BrainLikeMemorySystem_debug_20250709.log
+2025-07-09 23:23:22,054 | INFO | __init__:51 | 🔍 Memory Debug Logger initialized: logs/debug/BrainLikeMemorySystem_debug_20250709.log
+2025-07-09 23:23:22,054 | INFO | log_memory_operation:350 | 🧠 MEMORY OPERATION: system_initialization
+2025-07-09 23:23:22,054 | DEBUG | log_memory_operation:351 | MEMORY_OPERATION_DETAIL: {
+  "action": "memory_operation",
+  "operation": "system_initialization",
+  "timestamp": "2025-07-09T23:23:22.054128",
+  "data": {
+    "memory_id": "system",
+    "content": "Brain-Like Memory System initialized",
+    "strength": 1.0,
+    "emotional_context": {
+      "emotional_intensity": 0.0,
+      "emotional_valence": 0.0,
+      "system_state": "initialized"
+    }
+  }
+}
+2025-07-09 23:23:22,054 | DEBUG | wrapper:65 | Starting store_message with args: (), kwargs: {'content': 'Hallo! Ich bin Max Mustermann und arbeite als Entwickler bei Google.', 'user_id': 'test_user', 'conversation_id': 'test_conv', 'message_type': 'user', 'emotional_context': {'emotion': 'happy', 'intensity': 0.8}}
+2025-07-09 23:23:22,054 | ERROR | wrapper:77 | Error in store_message: 'BrainLikeMemorySystem' object has no attribute 'debug_log_storage_backend_operation'
+2025-07-09 23:23:22,055 | DEBUG | wrapper:78 | Traceback: Traceback (most recent call last):
+  File "/Users/Leon/Desktop/Kira_Home/memory/brain_memory_system.py", line 221, in store_message
+    emotional_valence, emotional_intensity = self._analyze_emotional_context(content, emotional_context)
+  File "/Users/Leon/Desktop/Kira_Home/memory/brain_memory_system.py", line 468, in _analyze_emotional_context
+    self.debug_log_emotional_memory_processing(
+AttributeError: 'BrainLikeMemorySystem' object has no attribute 'debug_log_emotional_memory_processing'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/Leon/Desktop/Kira_Home/memory/debug_integration.py", line 68, in wrapper
+    result = func(self, *args, **kwargs)
+  File "/Users/Leon/Desktop/Kira_Home/memory/brain_memory_system.py", line 307, in store_message
+    self.debug_log_storage_backend_operation(
+AttributeError: 'BrainLikeMemorySystem' object has no attribute 'debug_log_storage_backend_operation'
+
+2025-07-09 23:26:46,987 | INFO | __init__:51 | 🔍 Memory Debug Logger initialized: logs/debug/BrainLikeMemorySystem_debug_20250709.log
+2025-07-09 23:26:46,987 | INFO | log_memory_operation:350 | 🧠 MEMORY OPERATION: system_initialization
+2025-07-09 23:26:46,987 | DEBUG | log_memory_operation:351 | MEMORY_OPERATION_DETAIL: {
+  "action": "memory_operation",
+  "operation": "system_initialization",
+  "timestamp": "2025-07-09T23:26:46.987498",
+  "data": {
+    "memory_id": "system",
+    "content": "Brain-Like Memory System initialized",
+    "strength": 1.0,
+    "emotional_context": {
+      "emotional_intensity": 0.0,
+      "emotional_valence": 0.0,
+      "system_state": "initialized"
+    }
+  }
+}
+2025-07-09 23:26:46,987 | DEBUG | wrapper:65 | Starting store_message with args: (), kwargs: {'content': 'Hallo! Ich bin Max Mustermann und arbeite als Entwickler bei Google.', 'user_id': 'test_user', 'conversation_id': 'test_conv', 'message_type': 'user', 'emotional_context': {'emotion': 'happy', 'intensity': 0.8}}
+2025-07-09 23:26:46,987 | ERROR | wrapper:77 | Error in store_message: 'MemoryDebugLogger' object has no attribute 'log_storage_operation'
+2025-07-09 23:26:46,988 | DEBUG | wrapper:78 | Traceback: Traceback (most recent call last):
+  File "/Users/Leon/Desktop/Kira_Home/memory/brain_memory_system.py", line 221, in store_message
+    emotional_valence, emotional_intensity = self._analyze_emotional_context(content, emotional_context)
+  File "/Users/Leon/Desktop/Kira_Home/memory/brain_memory_system.py", line 470, in _analyze_emotional_context
+    self.debug_log_emotional_memory_processing(
+  File "/Users/Leon/Desktop/Kira_Home/memory/brain_memory_system.py", line 733, in debug_log_emotional_memory_processing
+    self.debug_logger.log_emotional_processing(*args, **kwargs)
+AttributeError: 'MemoryDebugLogger' object has no attribute 'log_emotional_processing'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/Leon/Desktop/Kira_Home/memory/debug_integration.py", line 68, in wrapper
+    result = func(self, *args, **kwargs)
+  File "/Users/Leon/Desktop/Kira_Home/memory/brain_memory_system.py", line 307, in store_message
+    self.debug_logger.log_storage_operation(
+AttributeError: 'MemoryDebugLogger' object has no attribute 'log_storage_operation'
+

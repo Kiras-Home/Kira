@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kira Chat - Modern Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .main-container {
+            text-align: center;
+            color: white;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .logo {
+            font-size: 4em;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .title {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .feature-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .feature-description {
+            font-size: 0.95em;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+
+        .chat-hint {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 15px 20px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            animation: bounceIn 1s ease-out;
+            max-width: 300px;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .voice-hint {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 15px 20px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            animation: slideInDown 1s ease-out;
+            max-width: 280px;
+        }
+
+        @keyframes slideInDown {
+            0% {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .wave {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M1200 120L0 16.48 0 0 1200 0 1200 120z' fill='%23ffffff' fill-opacity='0.1'/%3E%3C/svg%3E") repeat-x;
+            animation: wave 10s linear infinite;
+        }
+
+        @keyframes wave {
+            0% { background-position-x: 0; }
+            100% { background-position-x: 1200px; }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 20px;
+            }
+            
+            .title {
+                font-size: 2em;
+            }
+            
+            .logo {
+                font-size: 3em;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                margin-top: 40px;
+            }
+            
+            .chat-hint, .voice-hint {
+                position: static;
+                margin: 20px auto;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="logo">🤖</div>
+        <h1 class="title">Kira Assistant</h1>
+        <p class="subtitle">
+            Dein intelligenter KI-Assistent mit Sprachsteuerung und modernster Technologie.
+            <br>Sage "Kira" oder "Hey Kira" um mich zu aktivieren!
+        </p>
+        
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">💬</div>
+                <div class="feature-title">Intelligente Gespräche</div>
+                <div class="feature-description">
+                    Führe natürliche Gespräche mit mir. Ich verstehe Kontext und kann dir bei verschiedenen Aufgaben helfen.
+                </div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🎤</div>
+                <div class="feature-title">Sprachsteuerung</div>
+                <div class="feature-description">
+                    Aktiviere mich mit "Kira" oder "Hey Kira". Ich höre zu und antworte dir auch mit Sprache.
+                </div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🧠</div>
+                <div class="feature-title">Lernfähig</div>
+                <div class="feature-description">
+                    Ich merke mir unsere Gespräche und lerne deine Vorlieben, um dir bessere Antworten zu geben.
+                </div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">Schnell & Modern</div>
+                <div class="feature-description">
+                    Moderne Benutzeroberfläche mit schnellen Antworten und intuitiver Bedienung.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="voice-hint">
+        🎤 Sage "Kira" oder "Hey Kira" um mich zu aktivieren!
+    </div>
+
+    <div class="chat-hint">
+        💬 Klicke auf das Chat-Symbol um mit mir zu sprechen!
+    </div>
+
+    <div class="wave"></div>
+
+    <!-- Load the modern chat widget -->
+    <script src="/static/js/modern-chat-widget.js"></script>
+    
+    <script>
+        // Hide hints after some time
+        setTimeout(() => {
+            const hints = document.querySelectorAll('.chat-hint, .voice-hint');
+            hints.forEach(hint => {
+                hint.style.transition = 'opacity 0.5s ease';
+                hint.style.opacity = '0';
+                setTimeout(() => {
+                    hint.style.display = 'none';
+                }, 500);
+            });
+        }, 8000);
+
+        // Show notification if voice not supported
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            console.log('Voice recognition not supported in this browser');
+            const voiceHint = document.querySelector('.voice-hint');
+            if (voiceHint) {
+                voiceHint.innerHTML = '⚠️ Sprachsteuerung in diesem Browser nicht verfügbar';
+                voiceHint.style.background = 'rgba(255, 193, 7, 0.9)';
+            }
+        }
+
+        // Initialize chat widget when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Modern Chat Page loaded');
+            
+            // Auto-open chat after 3 seconds for demo
+            setTimeout(() => {
+                if (window.kiraChat && !window.kiraChat.isOpen) {
+                    console.log('🎯 Auto-opening chat for demo');
+                    window.kiraChat.toggle();
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

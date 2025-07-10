@@ -1,0 +1,1102 @@
+{% extends "base.html" %}
+
+{% block title %}🎛️ Kira Configuration Dashboard{% endblock %}
+
+{% block extra_head %}
+<style>
+    .config-dashboard {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px 0;
+    }
+
+    .config-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        margin-bottom: 20px;
+        transition: transform 0.3s ease;
+    }
+
+    .config-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .config-header {
+        background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 15px 15px 0 0;
+        margin: -1px -1px 0 -1px;
+    }
+
+    .component-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 15px 0;
+        border-left: 5px solid #4facfe;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .component-card:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        transform: translateX(5px);
+    }
+
+    .component-enabled {
+        border-left-color: #28a745;
+    }
+
+    .component-disabled {
+        border-left-color: #dc3545;
+        opacity: 0.7;
+    }
+
+    .component-warning {
+        border-left-color: #ffc107;
+    }
+
+    .config-toggle {
+        transform: scale(1.2);
+        margin-left: 10px;
+    }
+
+    .config-input {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 10px 15px;
+        transition: border-color 0.3s ease;
+        background: #f8f9fa;
+    }
+
+    .config-input:focus {
+        border-color: #4facfe;
+        box-shadow: 0 0 0 0.2rem rgba(79, 172, 254, 0.25);
+        background: white;
+    }
+
+    .preset-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 10px 0;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .preset-card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .preset-active {
+        background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+        box-shadow: 0 0 20px rgba(86, 171, 47, 0.4);
+    }
+
+    .status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+    }
+
+    .status-active { background: #28a745; }
+    .status-inactive { background: #dc3545; }
+    .status-warning { background: #ffc107; }
+
+    .config-stats {
+        background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 100%);
+        border-radius: 12px;
+        padding: 20px;
+        color: white;
+        text-align: center;
+        margin: 15px 0;
+    }
+
+    .validation-success {
+        background: linear-gradient(45deg, #56ab2f 0%, #a8e6cf 100%);
+        border-radius: 8px;
+        padding: 15px;
+        color: white;
+        margin: 10px 0;
+    }
+
+    .validation-error {
+        background: linear-gradient(45deg, #ff416c 0%, #ff4b2b 100%);
+        border-radius: 8px;
+        padding: 15px;
+        color: white;
+        margin: 10px 0;
+    }
+
+    .advanced-controls {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+    }
+
+    .config-button {
+        background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+
+    .config-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .config-button.danger {
+        background: linear-gradient(45deg, #ff416c 0%, #ff4b2b 100%);
+    }
+
+    .config-button.success {
+        background: linear-gradient(45deg, #56ab2f 0%, #a8e6cf 100%);
+    }
+
+    .loading-spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #4facfe;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .config-tabs {
+        display: flex;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 5px;
+        margin-bottom: 20px;
+    }
+
+    .config-tab {
+        flex: 1;
+        padding: 12px 20px;
+        text-align: center;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+        font-weight: 600;
+    }
+
+    .config-tab.active {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .config-tab:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .range-slider {
+        width: 100%;
+        margin: 15px 0;
+    }
+
+    .range-value {
+        background: #4facfe;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.9em;
+        margin-left: 10px;
+    }
+
+    .config-export {
+        background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+        border-radius: 12px;
+        padding: 20px;
+        color: white;
+        margin: 20px 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="config-dashboard">
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="config-card">
+            <div class="config-header">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1>🎛️ Kira Configuration Dashboard</h1>
+                        <p class="mb-0">Advanced system configuration and management</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="config-stats">
+                            <h5 id="config-version">v2.0.0</h5>
+                            <small id="config-status">Configuration Loaded</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuration Tabs -->
+            <div class="p-4">
+                <div class="config-tabs">
+                    <div class="config-tab active" onclick="switchTab('overview')">
+                        📊 Overview
+                    </div>
+                    <div class="config-tab" onclick="switchTab('components')">
+                        🔧 Components
+                    </div>
+                    <div class="config-tab" onclick="switchTab('presets')">
+                        ⚡ Presets
+                    </div>
+                    <div class="config-tab" onclick="switchTab('advanced')">
+                        ⚙️ Advanced
+                    </div>
+                    <div class="config-tab" onclick="switchTab('export')">
+                        💾 Export/Import
+                    </div>
+                </div>
+
+                <!-- Overview Tab -->
+                <div id="overview-content" class="tab-content active">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="component-card">
+                                <h5>📈 System Configuration Status</h5>
+                                <div id="config-overview-stats">
+                                    <div class="loading-spinner"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="component-card">
+                                <h5>🔍 Configuration Validation</h5>
+                                <div id="validation-status">
+                                    <div class="loading-spinner"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="component-card">
+                        <h5>🎯 Quick System Overview</h5>
+                        <div class="row" id="system-overview">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Components Tab -->
+                <div id="components-content" class="tab-content">
+                    <div id="components-list">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+
+                <!-- Presets Tab -->
+                <div id="presets-content" class="tab-content">
+                    <div class="component-card">
+                        <h5>⚡ Configuration Presets</h5>
+                        <p>Quickly apply pre-configured settings for different use cases.</p>
+                        <div id="presets-list">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Tab -->
+                <div id="advanced-content" class="tab-content">
+                    <div class="advanced-controls">
+                        <h5>⚙️ Advanced Configuration Management</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="component-card">
+                                    <h6>🔄 System Actions</h6>
+                                    <button class="config-button" onclick="reloadConfiguration()">
+                                        Reload Configuration
+                                    </button>
+                                    <button class="config-button" onclick="validateConfiguration()">
+                                        Validate Settings
+                                    </button>
+                                    <button class="config-button danger" onclick="resetToDefaults()">
+                                        Reset to Defaults
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="component-card">
+                                    <h6>📊 Environment Variables</h6>
+                                    <div id="environment-overrides">
+                                        <div class="loading-spinner"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="component-card">
+                            <h6>🔧 Raw Configuration Editor</h6>
+                            <p>Advanced users only - edit configuration directly</p>
+                            <textarea id="raw-config-editor" class="form-control" rows="15" style="font-family: monospace;"></textarea>
+                            <br>
+                            <button class="config-button success" onclick="saveRawConfiguration()">
+                                Save Raw Configuration
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export/Import Tab -->
+                <div id="export-content" class="tab-content">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="config-export">
+                                <h5>📤 Export Configuration</h5>
+                                <p>Download your current configuration for backup or sharing</p>
+                                <button class="config-button" onclick="exportConfiguration('json')">
+                                    Export as JSON
+                                </button>
+                                <button class="config-button" onclick="exportConfiguration('yaml')">
+                                    Export as YAML
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="config-export">
+                                <h5>📥 Import Configuration</h5>
+                                <p>Import configuration from file</p>
+                                <input type="file" id="config-file-input" class="form-control" accept=".json,.yaml,.yml">
+                                <br>
+                                <button class="config-button" onclick="importConfiguration()">
+                                    Import Configuration
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="component-card">
+                        <h5>🔗 Configuration Sharing</h5>
+                        <p>Share configuration with others or apply from shared configurations</p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Share Configuration (URL):</label>
+                                <input type="text" id="share-url" class="config-input form-control" readonly>
+                                <button class="config-button mt-2" onclick="generateShareUrl()">
+                                    Generate Share URL
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Apply Shared Configuration:</label>
+                                <input type="text" id="apply-url" class="config-input form-control" placeholder="Enter shared configuration URL">
+                                <button class="config-button mt-2" onclick="applySharedConfiguration()">
+                                    Apply Configuration
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration Status Footer -->
+        <div class="config-card">
+            <div class="p-3">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <small class="text-muted">
+                            Last Updated: <span id="last-updated">Loading...</span> | 
+                            Config File: <span id="config-file">Loading...</span>
+                        </small>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <button class="btn btn-sm btn-outline-primary" onclick="refreshDashboard()">
+                            🔄 Refresh
+                        </button>
+                        <button class="btn btn-sm btn-outline-success" onclick="applyAllChanges()">
+                            ✅ Apply Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Configuration Modals -->
+<div class="modal fade" id="componentConfigModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">🔧 Component Configuration</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="component-config-body">
+                <!-- Component configuration will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveComponentConfiguration()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Configuration Dashboard JavaScript
+class ConfigurationDashboard {
+    constructor() {
+        this.currentConfig = {};
+        this.pendingChanges = {};
+        this.activeTab = 'overview';
+        this.init();
+    }
+
+    init() {
+        this.loadCurrentConfiguration();
+        this.loadComponentsConfiguration();
+        this.loadConfigurationPresets();
+        this.startAutoRefresh();
+    }
+
+    // Tab Management
+    switchTab(tabName) {
+        // Hide all tab contents
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        
+        // Remove active class from all tabs
+        document.querySelectorAll('.config-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        // Show selected tab content
+        document.getElementById(`${tabName}-content`).classList.add('active');
+        
+        // Add active class to selected tab
+        event.target.classList.add('active');
+        
+        this.activeTab = tabName;
+        
+        // Load tab-specific data
+        this.loadTabData(tabName);
+    }
+
+    // API Calls
+    async loadCurrentConfiguration() {
+        try {
+            const response = await fetch('/api/config/current');
+            const data = await response.json();
+            
+            if (data.success) {
+                this.currentConfig = data.configuration;
+                this.updateOverviewDisplay(data);
+                this.updateValidationStatus(data);
+            } else {
+                this.showError('Failed to load configuration: ' + data.error);
+            }
+        } catch (error) {
+            this.showError('Configuration loading error: ' + error.message);
+        }
+    }
+
+    async loadComponentsConfiguration() {
+        try {
+            const response = await fetch('/api/config/components');
+            const data = await response.json();
+            
+            if (data.success) {
+                this.updateComponentsDisplay(data.components);
+            } else {
+                this.showError('Failed to load components: ' + data.error);
+            }
+        } catch (error) {
+            this.showError('Components loading error: ' + error.message);
+        }
+    }
+
+    async loadConfigurationPresets() {
+        try {
+            const response = await fetch('/api/config/presets');
+            const data = await response.json();
+            
+            if (data.success) {
+                this.updatePresetsDisplay(data.presets);
+            } else {
+                this.showError('Failed to load presets: ' + data.error);
+            }
+        } catch (error) {
+            this.showError('Presets loading error: ' + error.message);
+        }
+    }
+
+    async validateConfiguration() {
+        try {
+            const response = await fetch('/api/config/validate', { method: 'POST' });
+            const data = await response.json();
+            
+            if (data.success) {
+                this.updateValidationStatus(data);
+                this.showSuccess('Configuration validation completed');
+            } else {
+                this.showError('Validation failed: ' + data.error);
+            }
+        } catch (error) {
+            this.showError('Validation error: ' + error.message);
+        }
+    }
+
+    async updateComponentConfiguration(component, config) {
+        try {
+            const response = await fetch('/api/config/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ component, config })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                this.showSuccess(`${component} configuration updated successfully`);
+                if (data.restart_required) {
+                    this.showWarning('System restart required for changes to take effect');
+                }
+                this.loadCurrentConfiguration(); // Refresh
+            } else {
+                this.showError('Update failed: ' + data.error);
+            }
+        } catch (error) {
+            this.showError('Update error: ' + error.message);
+        }
+    }
+
+    async applyPreset(presetName) {
+        try {
+            const response = await fetch('/api/config/apply-preset', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ preset: presetName })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                this.showSuccess(`Preset "${presetName}" applied successfully`);
+                this.showWarning('System restart recommended');
+                this.loadCurrentConfiguration(); // Refresh
+            } else {
+                this.showError('Preset application failed: ' + data.error);
+            }
+        } catch (error) {
+            this.showError('Preset error: ' + error.message);
+        }
+    }
+
+    async exportConfiguration(format) {
+        try {
+            const response = await fetch(`/api/config/export?format=${format}`);
+            
+            if (format === 'yaml') {
+                // Handle YAML download
+                const blob = await response.blob();
+                this.downloadBlob(blob, `kira_config_${new Date().toISOString().split('T')[0]}.yaml`);
+            } else {
+                const data = await response.json();
+                if (data.success) {
+                    this.downloadJson(data.export_data, `kira_config_${new Date().toISOString().split('T')[0]}.json`);
+                } else {
+                    this.showError('Export failed: ' + data.error);
+                }
+            }
+        } catch (error) {
+            this.showError('Export error: ' + error.message);
+        }
+    }
+
+    // Display Updates
+    updateOverviewDisplay(data) {
+        const overviewStats = document.getElementById('config-overview-stats');
+        const config = data.configuration;
+        
+        overviewStats.innerHTML = `
+            <div class="row">
+                <div class="col-6">
+                    <h6>Components Enabled</h6>
+                    <div>
+                        ${Object.entries(config.components_enabled || {}).map(([key, value]) => 
+                            `<span class="status-indicator ${value ? 'status-active' : 'status-inactive'}"></span> ${key}`
+                        ).join('<br>')}
+                    </div>
+                </div>
+                <div class="col-6">
+                    <h6>System Health</h6>
+                    <div>
+                        <span class="status-indicator status-active"></span> Configuration Valid<br>
+                        <span class="status-indicator ${config.security_features?.rate_limiting ? 'status-active' : 'status-inactive'}"></span> Security Enabled<br>
+                        <span class="status-indicator ${config.performance_settings?.caching_enabled ? 'status-active' : 'status-inactive'}"></span> Performance Optimized
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Update header info
+        document.getElementById('config-version').textContent = config.system_info?.version || 'v2.0.0';
+        document.getElementById('config-file').textContent = data.config_file || 'default';
+        document.getElementById('last-updated').textContent = new Date().toLocaleString();
+    }
+
+    updateComponentsDisplay(components) {
+        const componentsList = document.getElementById('components-list');
+        
+        componentsList.innerHTML = Object.entries(components).map(([name, component]) => `
+            <div class="component-card ${component.enabled ? 'component-enabled' : 'component-disabled'}">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h6>
+                            <span class="status-indicator ${component.enabled ? 'status-active' : 'status-inactive'}"></span>
+                            ${this.getComponentIcon(name)} ${this.getComponentDisplayName(name)}
+                        </h6>
+                        <small class="text-muted">Status: ${component.status}</small>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="form-check form-switch d-inline-block">
+                            <input class="form-check-input config-toggle" type="checkbox" 
+                                   ${component.enabled ? 'checked' : ''} 
+                                   onchange="configDashboard.toggleComponent('${name}', this.checked)">
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary ms-2" 
+                                onclick="configDashboard.editComponent('${name}')">
+                            ⚙️ Configure
+                        </button>
+                    </div>
+                </div>
+                
+                ${component.enabled ? `
+                    <div class="mt-3">
+                        <small><strong>Key Settings:</strong></small>
+                        <div class="row">
+                            ${Object.entries(component.config || {}).slice(0, 3).map(([key, value]) => `
+                                <div class="col-md-4">
+                                    <small class="text-muted">${key}:</small><br>
+                                    <small><code>${typeof value === 'object' ? JSON.stringify(value) : value}</code></small>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+        `).join('');
+    }
+
+    updatePresetsDisplay(presets) {
+        const presetsList = document.getElementById('presets-list');
+        
+        presetsList.innerHTML = Object.entries(presets).map(([name, preset]) => `
+            <div class="preset-card" onclick="configDashboard.applyPreset('${name}')">
+                <h6>${preset.name}</h6>
+                <p class="mb-2">${preset.description}</p>
+                <small>
+                    Components: ${Object.keys(preset.config || {}).join(', ')}
+                </small>
+            </div>
+        `).join('');
+    }
+
+    updateValidationStatus(data) {
+        const validationStatus = document.getElementById('validation-status');
+        const validation = data.validation_result || { valid: true, errors: [], warnings: [] };
+        
+        if (validation.valid) {
+            validationStatus.innerHTML = `
+                <div class="validation-success">
+                    <h6>✅ Configuration Valid</h6>
+                    <p class="mb-0">All components properly configured</p>
+                </div>
+            `;
+        } else {
+            validationStatus.innerHTML = `
+                <div class="validation-error">
+                    <h6>❌ Configuration Issues</h6>
+                    <ul class="mb-0">
+                        ${validation.errors.map(error => `<li>${error}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        if (validation.warnings && validation.warnings.length > 0) {
+            validationStatus.innerHTML += `
+                <div class="alert alert-warning mt-2">
+                    <strong>Warnings:</strong>
+                    <ul class="mb-0">
+                        ${validation.warnings.map(warning => `<li>${warning}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+    }
+
+    // Component Management
+    toggleComponent(componentName, enabled) {
+        // This would typically update the component's enabled status
+        this.showInfo(`${componentName} ${enabled ? 'enabled' : 'disabled'}`);
+        
+        // In a real implementation, you'd make an API call here
+        // this.updateComponentConfiguration(componentName, { enabled });
+    }
+
+    editComponent(componentName) {
+        // Open component configuration modal
+        const modal = new bootstrap.Modal(document.getElementById('componentConfigModal'));
+        document.querySelector('#componentConfigModal .modal-title').textContent = 
+            `🔧 Configure ${this.getComponentDisplayName(componentName)}`;
+        
+        // Load component configuration form
+        this.loadComponentConfigForm(componentName);
+        
+        modal.show();
+    }
+
+    loadComponentConfigForm(componentName) {
+        const body = document.getElementById('component-config-body');
+        
+        // This would load the specific configuration form for the component
+        body.innerHTML = `
+            <div class="loading-spinner"></div>
+            <p class="text-center">Loading ${componentName} configuration...</p>
+        `;
+        
+        // Simulate loading component-specific configuration
+        setTimeout(() => {
+            body.innerHTML = this.generateComponentConfigForm(componentName);
+        }, 1000);
+    }
+
+    generateComponentConfigForm(componentName) {
+        // Generate configuration form based on component
+        const forms = {
+            'lm_studio': `
+                <div class="mb-3">
+                    <label class="form-label">LM Studio URL</label>
+                    <input type="text" class="config-input form-control" value="http://192.168.178.44:1234/v1">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Model Name</label>
+                    <input type="text" class="config-input form-control" value="auto">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Temperature</label>
+                    <input type="range" class="range-slider form-range" min="0" max="2" step="0.1" value="0.7" 
+                           onchange="this.nextElementSibling.textContent = this.value">
+                    <span class="range-value">0.7</span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Max Tokens</label>
+                    <input type="number" class="config-input form-control" value="2048" min="100" max="8192">
+                </div>
+            `,
+            'voice_system': `
+                <div class="mb-3">
+                    <label class="form-label">Default Emotion</label>
+                    <select class="config-input form-control">
+                        <option value="calm">Calm</option>
+                        <option value="excited">Excited</option>
+                        <option value="empathetic">Empathetic</option>
+                        <option value="thoughtful">Thoughtful</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Voice Speed</label>
+                    <input type="range" class="range-slider form-range" min="0.5" max="2" step="0.1" value="1.0"
+                           onchange="this.nextElementSibling.textContent = this.value">
+                    <span class="range-value">1.0</span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Sample Rate</label>
+                    <select class="config-input form-control">
+                        <option value="16000">16kHz</option>
+                        <option value="22050">22kHz</option>
+                        <option value="24000" selected>24kHz</option>
+                        <option value="44100">44kHz</option>
+                    </select>
+                </div>
+            `,
+            'memory_system': `
+                <div class="mb-3">
+                    <label class="form-label">STM Capacity</label>
+                    <input type="number" class="config-input form-control" value="50" min="10" max="200">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">LTM Capacity</label>
+                    <input type="number" class="config-input form-control" value="1000" min="100" max="10000">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Consolidation Threshold</label>
+                    <input type="range" class="range-slider form-range" min="0" max="1" step="0.1" value="0.7"
+                           onchange="this.nextElementSibling.textContent = this.value">
+                    <span class="range-value">0.7</span>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" checked>
+                    <label class="form-check-label">Enable Storage</label>
+                </div>
+            `
+        };
+        
+        return forms[componentName] || '<p>Configuration form not available for this component.</p>';
+    }
+
+    // Utility Methods
+    getComponentIcon(name) {
+        const icons = {
+            'lm_studio': '🤖',
+            'voice_system': '🎤',
+            'memory_system': '🧠',
+            'emotion_engine': '🎭',
+            'security': '🔒',
+            'database': '💾'
+        };
+        return icons[name] || '⚙️';
+    }
+
+    getComponentDisplayName(name) {
+        const names = {
+            'lm_studio': 'LM Studio',
+            'voice_system': 'Voice System',
+            'memory_system': 'Memory System',
+            'emotion_engine': 'Emotion Engine',
+            'security': 'Security',
+            'database': 'Database'
+        };
+        return names[name] || name.replace('_', ' ');
+    }
+
+    // Utility Functions
+    downloadJson(data, filename) {
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        this.downloadBlob(blob, filename);
+    }
+
+    downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    // Notifications
+    showSuccess(message) {
+        console.log('✅ Success:', message);
+        // Implement toast notification
+    }
+
+    showError(message) {
+        console.error('❌ Error:', message);
+        // Implement toast notification
+    }
+
+    showWarning(message) {
+        console.warn('⚠️ Warning:', message);
+        // Implement toast notification
+    }
+
+    showInfo(message) {
+        console.info('ℹ️ Info:', message);
+        // Implement toast notification
+    }
+
+    // Auto-refresh
+    startAutoRefresh() {
+        setInterval(() => {
+            if (this.activeTab === 'overview') {
+                this.loadCurrentConfiguration();
+            }
+        }, 30000); // Refresh every 30 seconds
+    }
+
+    loadTabData(tabName) {
+        switch(tabName) {
+            case 'overview':
+                this.loadCurrentConfiguration();
+                break;
+            case 'components':
+                this.loadComponentsConfiguration();
+                break;
+            case 'presets':
+                this.loadConfigurationPresets();
+                break;
+            case 'advanced':
+                this.loadAdvancedOptions();
+                break;
+            case 'export':
+                this.loadExportOptions();
+                break;
+        }
+    }
+
+    loadAdvancedOptions() {
+        // Load environment variables and raw config
+        fetch('/api/config/current')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('raw-config-editor').value = 
+                        JSON.stringify(data.configuration, null, 2);
+                    
+                    const envOverrides = document.getElementById('environment-overrides');
+                    envOverrides.innerHTML = Object.entries(data.environment_overrides || {}).length > 0 ?
+                        Object.entries(data.environment_overrides).map(([key, value]) => 
+                            `<div><code>${key}</code>: <strong>${value}</strong></div>`
+                        ).join('') :
+                        '<p class="text-muted">No environment overrides active</p>';
+                }
+            });
+    }
+
+    loadExportOptions() {
+        // Update export options display
+        const now = new Date().toISOString().split('T')[0];
+        document.getElementById('share-url').placeholder = `https://kira.local/config/shared/${now}`;
+    }
+}
+
+// Global functions for HTML onclick handlers
+function switchTab(tabName) {
+    configDashboard.switchTab(tabName);
+}
+
+function reloadConfiguration() {
+    fetch('/api/config/reload', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                configDashboard.showSuccess('Configuration reloaded successfully');
+                configDashboard.loadCurrentConfiguration();
+            } else {
+                configDashboard.showError('Reload failed: ' + data.error);
+            }
+        });
+}
+
+function validateConfiguration() {
+    configDashboard.validateConfiguration();
+}
+
+function resetToDefaults() {
+    if (confirm('Are you sure you want to reset all settings to defaults? This cannot be undone.')) {
+        configDashboard.showWarning('Reset to defaults functionality not yet implemented');
+    }
+}
+
+function saveRawConfiguration() {
+    const rawConfig = document.getElementById('raw-config-editor').value;
+    try {
+        const config = JSON.parse(rawConfig);
+        configDashboard.showSuccess('Raw configuration syntax is valid');
+        // In a real implementation, this would save the configuration
+    } catch (error) {
+        configDashboard.showError('Invalid JSON syntax: ' + error.message);
+    }
+}
+
+function exportConfiguration(format) {
+    configDashboard.exportConfiguration(format);
+}
+
+function importConfiguration() {
+    const fileInput = document.getElementById('config-file-input');
+    if (fileInput.files.length === 0) {
+        configDashboard.showWarning('Please select a configuration file');
+        return;
+    }
+    
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const config = JSON.parse(e.target.result);
+            configDashboard.showSuccess('Configuration file loaded successfully');
+            // In a real implementation, this would apply the configuration
+        } catch (error) {
+            configDashboard.showError('Invalid configuration file: ' + error.message);
+        }
+    };
+    reader.readAsText(file);
+}
+
+function generateShareUrl() {
+    const now = new Date().toISOString().split('T')[0];
+    const shareUrl = `https://kira.local/config/shared/${now}_${Math.random().toString(36).substr(2, 9)}`;
+    document.getElementById('share-url').value = shareUrl;
+    configDashboard.showSuccess('Share URL generated (demo)');
+}
+
+function applySharedConfiguration() {
+    const url = document.getElementById('apply-url').value;
+    if (!url) {
+        configDashboard.showWarning('Please enter a shared configuration URL');
+        return;
+    }
+    configDashboard.showInfo('Applying shared configuration (demo): ' + url);
+}
+
+function refreshDashboard() {
+    configDashboard.loadCurrentConfiguration();
+    configDashboard.loadComponentsConfiguration();
+    configDashboard.showInfo('Dashboard refreshed');
+}
+
+function applyAllChanges() {
+    configDashboard.showSuccess('All pending changes applied (demo)');
+}
+
+function saveComponentConfiguration() {
+    configDashboard.showSuccess('Component configuration saved (demo)');
+    bootstrap.Modal.getInstance(document.getElementById('componentConfigModal')).hide();
+}
+
+// Initialize dashboard when page loads
+let configDashboard;
+document.addEventListener('DOMContentLoaded', function() {
+    configDashboard = new ConfigurationDashboard();
+});
+</script>
+{% endblock %}

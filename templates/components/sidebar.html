@@ -1,0 +1,304 @@
+<!-- Modern Dynamic Sidebar Component -->
+
+{% macro sidebar_menu(items, current_page="") %}
+<div class="modern-sidebar" id="modernSidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <img src="/static/assets/kira-logo.svg" alt="Kira" class="logo-img">
+            <span class="logo-text">Kira</span>
+        </div>
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+    
+    <div class="sidebar-content">
+        <nav class="sidebar-nav">
+            {% for item in items %}
+                {% if item.divider %}
+                    <div class="nav-divider">
+                        <span class="divider-text">{{ item.label }}</span>
+                    </div>
+                {% else %}
+                    <a href="{{ item.url }}" 
+                       class="nav-item{% if item.page == current_page %} active{% endif %}{% if item.disabled %} disabled{% endif %}"
+                       {% if item.tooltip %}title="{{ item.tooltip }}"{% endif %}>
+                        <div class="nav-icon">
+                            <i class="{{ item.icon }}"></i>
+                        </div>
+                        <span class="nav-label">{{ item.label }}</span>
+                        {% if item.badge %}
+                            <span class="nav-badge bg-{{ item.badge.color }}">{{ item.badge.value }}</span>
+                        {% endif %}
+                        {% if item.submenu %}
+                            <i class="nav-arrow fas fa-chevron-right"></i>
+                        {% endif %}
+                    </a>
+                    
+                    {% if item.submenu %}
+                        <div class="nav-submenu">
+                            {% for subitem in item.submenu %}
+                                <a href="{{ subitem.url }}" 
+                                   class="nav-subitem{% if subitem.page == current_page %} active{% endif %}">
+                                    <i class="{{ subitem.icon }}"></i>
+                                    <span>{{ subitem.label }}</span>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <img src="https://via.placeholder.com/40x40/00D2D3/ffffff?text=K" alt="User" class="user-avatar">
+                <div class="user-info">
+                    <div class="user-name">Kira User</div>
+                    <div class="user-status">Online</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.modern-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: var(--sidebar-width, 280px);
+    background: var(--sidebar-bg, linear-gradient(180deg, var(--kira-primary) 0%, var(--kira-secondary) 100%));
+    color: white;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+}
+
+.modern-sidebar.collapsed {
+    width: 70px;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    transition: opacity 0.3s ease;
+}
+
+.modern-sidebar.collapsed .sidebar-logo .logo-text {
+    opacity: 0;
+    width: 0;
+}
+
+.logo-img {
+    width: 32px;
+    height: 32px;
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.sidebar-toggle {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 80px);
+    overflow-y: auto;
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: var(--spacing-md) 0;
+}
+
+.nav-divider {
+    margin: var(--spacing-lg) 0 var(--spacing-md);
+    padding: 0 var(--spacing-lg);
+}
+
+.divider-text {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: opacity 0.3s ease;
+}
+
+.modern-sidebar.collapsed .divider-text {
+    opacity: 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-md) var(--spacing-lg);
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
+    margin: 2px var(--spacing-md);
+    border-radius: var(--radius-md);
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transform: translateX(4px);
+}
+
+.nav-item.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    box-shadow: var(--shadow-md);
+}
+
+.nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60%;
+    background: white;
+    border-radius: 0 2px 2px 0;
+}
+
+.nav-icon {
+    width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: var(--spacing-md);
+    font-size: 1rem;
+}
+
+.nav-label {
+    flex: 1;
+    white-space: nowrap;
+    transition: opacity 0.3s ease;
+}
+
+.modern-sidebar.collapsed .nav-label {
+    opacity: 0;
+    width: 0;
+}
+
+.nav-badge {
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-left: auto;
+    transition: opacity 0.3s ease;
+}
+
+.modern-sidebar.collapsed .nav-badge {
+    opacity: 0;
+}
+
+.nav-arrow {
+    margin-left: auto;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.nav-item:hover .nav-arrow {
+    transform: rotate(90deg);
+}
+
+.sidebar-footer {
+    padding: var(--spacing-lg);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    transition: opacity 0.3s ease;
+}
+
+.modern-sidebar.collapsed .user-info {
+    opacity: 0;
+    width: 0;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.user-status {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modern-sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .modern-sidebar.open {
+        transform: translateX(0);
+    }
+}
+</style>
+{% endmacro %}
+
+<!-- Sidebar Toggle Script -->
+<script>
+function toggleSidebar() {
+    const sidebar = document.getElementById('modernSidebar');
+    sidebar.classList.toggle('collapsed');
+    
+    // Save state
+    localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+}
+
+// Restore sidebar state
+document.addEventListener('DOMContentLoaded', () => {
+    const sidebar = document.getElementById('modernSidebar');
+    const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    
+    if (isCollapsed) {
+        sidebar.classList.add('collapsed');
+    }
+});
+</script>
+{% endmacro %}

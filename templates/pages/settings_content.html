@@ -1,0 +1,1221 @@
+{% extends "layouts/dashboard.html" %}
+{% set show_sidebar = true %}
+
+{% block title %}Kira - Settings{% endblock %}
+
+{% block dashboard_icon %}<i class="fas fa-cog"></i>{% endblock %}
+{% block dashboard_title %}System Settings{% endblock %}
+{% block dashboard_description %}Comprehensive System Configuration & Preferences - Customize Your Kira Experience{% endblock %}
+
+{% block dashboard_stats %}
+<div class="dashboard-stats" id="settingsOverview">
+    <!-- Settings stats werden dynamisch gefüllt -->
+</div>
+{% endblock %}
+
+{% block main_content %}
+<!-- General Settings Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-sliders-h me-2"></i>
+            General Settings
+        </h3>
+        <div class="settings-actions">
+            <button class="btn btn-outline-secondary btn-sm" onclick="resetToDefaults()">
+                <i class="fas fa-undo me-2"></i>
+                Reset to Defaults
+            </button>
+            <button class="btn btn-kira btn-sm" onclick="saveAllSettings()">
+                <i class="fas fa-save me-2"></i>
+                Save Changes
+            </button>
+        </div>
+    </div>
+    <div class="settings-grid">
+        <div class="setting-group">
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label">Language / Sprache</label>
+                    <p class="setting-description">Choose your preferred language for the interface</p>
+                </div>
+                <div class="setting-control">
+                    <select class="form-select" id="language" onchange="updateSetting('language')">
+                        <option value="de" selected>Deutsch</option>
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label">Theme / Design</label>
+                    <p class="setting-description">Select your preferred color scheme</p>
+                </div>
+                <div class="setting-control">
+                    <select class="form-select" id="theme" onchange="updateSetting('theme')">
+                        <option value="auto" selected>Auto (System)</option>
+                        <option value="light">Light Mode</option>
+                        <option value="dark">Dark Mode</option>
+                        <option value="kira">Kira Theme</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label">Time Zone</label>
+                    <p class="setting-description">Set your local time zone</p>
+                </div>
+                <div class="setting-control">
+                    <select class="form-select" id="timezone" onchange="updateSetting('timezone')">
+                        <option value="Europe/Berlin" selected>Europe/Berlin (CET)</option>
+                        <option value="America/New_York">America/New_York (EST)</option>
+                        <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+                        <option value="UTC">UTC</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label">Date Format</label>
+                    <p class="setting-description">Choose how dates are displayed</p>
+                </div>
+                <div class="setting-control">
+                    <select class="form-select" id="dateFormat" onchange="updateSetting('dateFormat')">
+                        <option value="DD.MM.YYYY" selected>DD.MM.YYYY (German)</option>
+                        <option value="MM/DD/YYYY">MM/DD/YYYY (US)</option>
+                        <option value="YYYY-MM-DD">YYYY-MM-DD (ISO)</option>
+                        <option value="DD/MM/YYYY">DD/MM/YYYY (UK)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI & Voice Settings Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-brain me-2"></i>
+            AI & Voice Settings
+        </h3>
+    </div>
+    <div class="settings-grid">
+        <div class="setting-group">
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label">Voice Assistant</label>
+                    <p class="setting-description">Enable Kira's voice interaction capabilities</p>
+                </div>
+                <div class="setting-control">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="voiceEnabled" checked onchange="updateSetting('voiceEnabled')">
+                        <label class="form-check-label" for="voiceEnabled">Enable Voice Assistant</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label">Voice Speed</label>
+                    <p class="setting-description">Adjust the speech synthesis speed</p>
+                </div>
+                <div class="setting-control">
+                    <div class="range-control">
+                        <input type="range" class="form-range" id="voiceSpeed" min="0.5" max="2" step="0.1" value="1" onchange="updateSetting('voiceSpeed')">
+                        <div class="range-labels">
+                            <span>Slow</span>
+                            <span id="voiceSpeedValue">1.0x</span>
+                            <span>Fast</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label">AI Response Style</label>
+                    <p class="setting-description">Choose how Kira communicates with you</p>
+                </div>
+                <div class="setting-control">
+                    <select class="form-select" id="aiStyle" onchange="updateSetting('aiStyle')">
+                        <option value="friendly" selected>Friendly & Casual</option>
+                        <option value="professional">Professional</option>
+                        <option value="concise">Concise & Direct</option>
+                        <option value="detailed">Detailed & Explanatory</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label">Auto-Learning</label>
+                    <p class="setting-description">Allow Kira to learn from your interactions</p>
+                </div>
+                <div class="setting-control">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="autoLearning" checked onchange="updateSetting('autoLearning')">
+                        <label class="form-check-label" for="autoLearning">Enable Auto-Learning</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Privacy & Security Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-shield-alt me-2"></i>
+            Privacy & Security
+        </h3>
+    </div>
+    <div class="settings-grid">
+        <div class="setting-group">
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label">Data Collection</label>
+                    <p class="setting-description">Control what data Kira collects for improvement</p>
+                </div>
+                <div class="setting-control">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="dataCollection" onchange="updateSetting('dataCollection')">
+                        <label class="form-check-label" for="dataCollection">Allow Anonymous Usage Data</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label">Chat History</label>
+                    <p class="setting-description">Configure chat history retention</p>
+                </div>
+                <div class="setting-control">
+                    <select class="form-select" id="chatRetention" onchange="updateSetting('chatRetention')">
+                        <option value="forever" selected>Keep Forever</option>
+                        <option value="1year">1 Year</option>
+                        <option value="6months">6 Months</option>
+                        <option value="3months">3 Months</option>
+                        <option value="1month">1 Month</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label">Encryption</label>
+                    <p class="setting-description">Enable end-to-end encryption for sensitive data</p>
+                </div>
+                <div class="setting-control">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="encryption" checked onchange="updateSetting('encryption')">
+                        <label class="form-check-label" for="encryption">Enable Encryption</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label">Auto-Lock</label>
+                    <p class="setting-description">Automatically lock the interface after inactivity</p>
+                </div>
+                <div class="setting-control">
+                    <select class="form-select" id="autoLock" onchange="updateSetting('autoLock')">
+                        <option value="never">Never</option>
+                        <option value="5min">5 Minutes</option>
+                        <option value="15min" selected>15 Minutes</option>
+                        <option value="30min">30 Minutes</option>
+                        <option value="1hour">1 Hour</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Performance Settings Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-tachometer-alt me-2"></i>
+            Performance Settings
+        </h3>
+    </div>
+    <div class="settings-grid">
+        <div class="setting-group">
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label">Animation Effects</label>
+                    <p class="setting-description">Enable smooth animations and transitions</p>
+                </div>
+                <div class="setting-control">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="animations" checked onchange="updateSetting('animations')">
+                        <label class="form-check-label" for="animations">Enable Animations</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label">Auto-Refresh Interval</label>
+                    <p class="setting-description">How often dashboards update automatically</p>
+                </div>
+                <div class="setting-control">
+                    <select class="form-select" id="refreshInterval" onchange="updateSetting('refreshInterval')">
+                        <option value="5000">5 Seconds</option>
+                        <option value="10000">10 Seconds</option>
+                        <option value="30000" selected>30 Seconds</option>
+                        <option value="60000">1 Minute</option>
+                        <option value="disabled">Disabled</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label">Background Processing</label>
+                    <p class="setting-description">Allow Kira to process tasks in the background</p>
+                </div>
+                <div class="setting-control">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="backgroundProcessing" checked onchange="updateSetting('backgroundProcessing')">
+                        <label class="form-check-label" for="backgroundProcessing">Enable Background Processing</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <label class="setting-label">Memory Usage Limit</label>
+                    <p class="setting-description">Maximum memory Kira can use</p>
+                </div>
+                <div class="setting-control">
+                    <div class="range-control">
+                        <input type="range" class="form-range" id="memoryLimit" min="512" max="8192" step="256" value="2048" onchange="updateSetting('memoryLimit')">
+                        <div class="range-labels">
+                            <span>512 MB</span>
+                            <span id="memoryLimitValue">2048 MB</span>
+                            <span>8 GB</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block side_content %}
+<!-- Quick Settings Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-bolt me-2"></i>
+            Quick Settings
+        </h4>
+    </div>
+    <div class="quick-settings">
+        <div class="quick-setting-item">
+            <span class="quick-setting-label">Dark Mode</span>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="quickDarkMode" onchange="toggleDarkMode()">
+            </div>
+        </div>
+        <div class="quick-setting-item">
+            <span class="quick-setting-label">Notifications</span>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="quickNotifications" checked onchange="toggleNotifications()">
+            </div>
+        </div>
+        <div class="quick-setting-item">
+            <span class="quick-setting-label">Sound Effects</span>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="quickSounds" checked onchange="toggleSounds()">
+            </div>
+        </div>
+        <div class="quick-setting-item">
+            <span class="quick-setting-label">Auto-Save</span>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="quickAutoSave" checked onchange="toggleAutoSave()">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Settings Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-user-cog me-2"></i>
+            Profile Settings
+        </h4>
+    </div>
+    <div class="profile-settings">
+        <div class="profile-avatar">
+            <img src="https://via.placeholder.com/80x80/00D2D3/ffffff?text=K" alt="Profile" class="avatar-img">
+            <button class="btn btn-sm btn-outline-kira mt-2" onclick="changeAvatar()">
+                <i class="fas fa-camera me-1"></i>
+                Change Avatar
+            </button>
+        </div>
+        <div class="profile-form">
+            <div class="mb-3">
+                <label class="form-label">Display Name</label>
+                <input type="text" class="form-control" id="displayName" value="Kira User" onchange="updateProfile('displayName')">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" value="user@kira.ai" onchange="updateProfile('email')">
+            </div>
+            <button class="btn btn-kira btn-sm w-100" onclick="updateProfile()">
+                <i class="fas fa-save me-2"></i>
+                Update Profile
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- System Information Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-info-circle me-2"></i>
+            System Information
+        </h4>
+    </div>
+    <div id="systemInfo">
+        <!-- System information wird hier angezeigt -->
+    </div>
+</div>
+
+<!-- Backup & Export Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-download me-2"></i>
+            Backup & Export
+        </h4>
+    </div>
+    <div class="backup-tools">
+        <button class="btn btn-outline-kira btn-sm w-100 mb-2" onclick="exportSettings()">
+            <i class="fas fa-file-export me-2"></i>
+            Export Settings
+        </button>
+        <button class="btn btn-outline-info btn-sm w-100 mb-2" onclick="importSettings()">
+            <i class="fas fa-file-import me-2"></i>
+            Import Settings
+        </button>
+        <button class="btn btn-outline-success btn-sm w-100 mb-2" onclick="createBackup()">
+            <i class="fas fa-shield-alt me-2"></i>
+            Create Backup
+        </button>
+        <button class="btn btn-outline-warning btn-sm w-100" onclick="restoreBackup()">
+            <i class="fas fa-history me-2"></i>
+            Restore Backup
+        </button>
+    </div>
+</div>
+
+<!-- Advanced Tools Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-tools me-2"></i>
+            Advanced Tools
+        </h4>
+    </div>
+    <div class="advanced-tools">
+        <button class="btn btn-outline-secondary btn-sm w-100 mb-2" onclick="clearCache()">
+            <i class="fas fa-broom me-2"></i>
+            Clear Cache
+        </button>
+        <button class="btn btn-outline-warning btn-sm w-100 mb-2" onclick="resetSettings()">
+            <i class="fas fa-undo me-2"></i>
+            Reset All Settings
+        </button>
+        <button class="btn btn-outline-info btn-sm w-100 mb-2" onclick="systemDiagnostics()">
+            <i class="fas fa-stethoscope me-2"></i>
+            System Diagnostics
+        </button>
+        <button class="btn btn-outline-danger btn-sm w-100" onclick="factoryReset()">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Factory Reset
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+{{ super() }}
+<style>
+    .settings-actions {
+        display: flex;
+        gap: var(--spacing-sm);
+        align-items: center;
+    }
+
+    .settings-grid {
+        display: grid;
+        gap: var(--spacing-lg);
+    }
+
+    .setting-group {
+        display: grid;
+        gap: var(--spacing-md);
+    }
+
+    .setting-item {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: var(--spacing-lg);
+        align-items: center;
+        padding: var(--spacing-lg);
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-lg);
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+    }
+
+    .setting-item:hover {
+        background: white;
+        border-color: var(--kira-gray-200);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .setting-info {
+        min-width: 0;
+    }
+
+    .setting-label {
+        display: block;
+        font-weight: 600;
+        color: var(--kira-gray-800);
+        margin-bottom: 4px;
+        font-size: 1rem;
+    }
+
+    .setting-description {
+        color: var(--kira-gray-600);
+        font-size: 0.875rem;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .setting-control {
+        min-width: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .form-check-input {
+        width: 3rem;
+        height: 1.5rem;
+        cursor: pointer;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--kira-primary);
+        border-color: var(--kira-primary);
+    }
+
+    .form-check-input:focus {
+        border-color: var(--kira-primary);
+        box-shadow: 0 0 0 0.25rem rgba(0, 210, 211, 0.25);
+    }
+
+    .range-control {
+        width: 100%;
+        min-width: 200px;
+    }
+
+    .form-range {
+        width: 100%;
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .form-range::-webkit-slider-thumb {
+        background: var(--kira-primary);
+        border: none;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+    .form-range::-moz-range-thumb {
+        background: var(--kira-primary);
+        border: none;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+    .range-labels {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.75rem;
+        color: var(--kira-gray-500);
+    }
+
+    .range-labels span:nth-child(2) {
+        font-weight: 600;
+        color: var(--kira-primary);
+    }
+
+    .quick-settings {
+        display: grid;
+        gap: var(--spacing-md);
+    }
+
+    .quick-setting-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-md);
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-md);
+        transition: background 0.2s ease;
+    }
+
+    .quick-setting-item:hover {
+        background: white;
+    }
+
+    .quick-setting-label {
+        font-weight: 500;
+        color: var(--kira-gray-700);
+    }
+
+    .profile-settings {
+        text-align: center;
+    }
+
+    .profile-avatar {
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .avatar-img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 3px solid var(--kira-primary);
+        margin-bottom: var(--spacing-sm);
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .profile-form {
+        text-align: left;
+    }
+
+    .system-info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-sm) var(--spacing-md);
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .system-info-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-label {
+        font-weight: 500;
+        color: var(--kira-gray-700);
+    }
+
+    .info-value {
+        font-weight: 600;
+        color: var(--kira-gray-800);
+        font-family: 'Courier New', monospace;
+        font-size: 0.875rem;
+    }
+
+    .backup-tools .btn,
+    .advanced-tools .btn {
+        transition: all 0.2s ease;
+    }
+
+    .backup-tools .btn:hover,
+    .advanced-tools .btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .settings-changed {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: var(--kira-warning);
+        color: white;
+        padding: var(--spacing-md) var(--spacing-lg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        z-index: 1000;
+        display: none;
+        animation: slideInUp 0.3s ease;
+    }
+
+    .settings-changed.show {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+    }
+
+    @keyframes slideInUp {
+        from {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    /* Theme Previews */
+    .theme-preview {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--spacing-sm);
+        margin-top: var(--spacing-sm);
+    }
+
+    .theme-option {
+        aspect-ratio: 2;
+        border-radius: var(--radius-md);
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .theme-option:hover {
+        transform: scale(1.05);
+    }
+
+    .theme-option.selected {
+        border-color: var(--kira-primary);
+        box-shadow: 0 0 0 2px rgba(0, 210, 211, 0.2);
+    }
+
+    .theme-option.light {
+        background: linear-gradient(135deg, #ffffff 50%, #f8f9fa 50%);
+    }
+
+    .theme-option.dark {
+        background: linear-gradient(135deg, #212529 50%, #343a40 50%);
+    }
+
+    .theme-option.kira {
+        background: linear-gradient(135deg, var(--kira-primary) 50%, var(--kira-secondary) 50%);
+    }
+
+    .theme-option.auto {
+        background: linear-gradient(135deg, #ffffff 25%, #212529 25%, #212529 50%, #ffffff 50%, #ffffff 75%, #212529 75%);
+        background-size: 20px 20px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .setting-item {
+            grid-template-columns: 1fr;
+            gap: var(--spacing-md);
+            text-align: center;
+        }
+
+        .setting-control {
+            min-width: auto;
+            justify-content: center;
+        }
+
+        .settings-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .settings-actions .btn {
+            width: 100%;
+        }
+
+        .range-control {
+            min-width: auto;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    class SettingsDashboard {
+        constructor() {
+            this.baseUrl = '/api/settings';
+            this.settings = {};
+            this.hasChanges = false;
+            
+            this.init();
+        }
+
+        async init() {
+            console.log('⚙️ Settings Dashboard wird initialisiert...');
+            
+            // Load current settings
+            await this.loadAllSettings();
+            
+            // Load system information
+            this.loadSystemInfo();
+            
+            // Setup auto-save
+            this.setupAutoSave();
+            
+            console.log('✅ Settings Dashboard bereit');
+        }
+
+        async loadAllSettings() {
+            try {
+                await Promise.all([
+                    this.loadSettingsOverview(),
+                    this.loadUserSettings()
+                ]);
+            } catch (error) {
+                console.error('❌ Settings load error:', error);
+                this.loadDefaultSettings();
+            }
+        }
+
+        async loadSettingsOverview() {
+            const container = document.getElementById('settingsOverview');
+            
+            const stats = [
+                { 
+                    icon: 'fas fa-user-cog', 
+                    label: 'Active Profile', 
+                    value: 'Kira User', 
+                    color: 'var(--kira-settings-1)' 
+                },
+                { 
+                    icon: 'fas fa-palette', 
+                    label: 'Current Theme', 
+                    value: 'Auto Mode', 
+                    color: 'var(--kira-settings-2)' 
+                },
+                { 
+                    icon: 'fas fa-globe', 
+                    label: 'Language', 
+                    value: 'Deutsch', 
+                    color: 'var(--kira-settings-3)' 
+                },
+                { 
+                    icon: 'fas fa-shield-alt', 
+                    label: 'Security Level', 
+                    value: 'High', 
+                    color: 'var(--kira-settings-4)' 
+                }
+            ];
+
+            container.innerHTML = stats.map(stat => 
+                DashboardUtils.createStatCard(stat.icon, stat.label, stat.value, stat.color)
+            ).join('');
+        }
+
+        async loadUserSettings() {
+            try {
+                const response = await fetch(`${this.baseUrl}/user`);
+                if (response.ok) {
+                    this.settings = await response.json();
+                } else {
+                    this.loadDefaultSettings();
+                }
+            } catch (error) {
+                console.warn('Using default settings:', error);
+                this.loadDefaultSettings();
+            }
+            
+            this.applySettingsToUI();
+        }
+
+        loadDefaultSettings() {
+            this.settings = {
+                language: 'de',
+                theme: 'auto',
+                timezone: 'Europe/Berlin',
+                dateFormat: 'DD.MM.YYYY',
+                voiceEnabled: true,
+                voiceSpeed: 1.0,
+                aiStyle: 'friendly',
+                autoLearning: true,
+                dataCollection: false,
+                chatRetention: 'forever',
+                encryption: true,
+                autoLock: '15min',
+                animations: true,
+                refreshInterval: 30000,
+                backgroundProcessing: true,
+                memoryLimit: 2048,
+                notifications: true,
+                sounds: true,
+                autoSave: true,
+                darkMode: false
+            };
+            
+            this.applySettingsToUI();
+        }
+
+        applySettingsToUI() {
+            // Apply each setting to the corresponding UI element
+            Object.keys(this.settings).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    if (element.type === 'checkbox') {
+                        element.checked = this.settings[key];
+                    } else if (element.type === 'range') {
+                        element.value = this.settings[key];
+                        this.updateRangeDisplay(key, this.settings[key]);
+                    } else {
+                        element.value = this.settings[key];
+                    }
+                }
+            });
+
+            // Apply quick settings
+            document.getElementById('quickDarkMode').checked = this.settings.darkMode;
+            document.getElementById('quickNotifications').checked = this.settings.notifications;
+            document.getElementById('quickSounds').checked = this.settings.sounds;
+            document.getElementById('quickAutoSave').checked = this.settings.autoSave;
+        }
+
+        updateRangeDisplay(settingKey, value) {
+            const displayElement = document.getElementById(settingKey + 'Value');
+            if (displayElement) {
+                switch(settingKey) {
+                    case 'voiceSpeed':
+                        displayElement.textContent = value + 'x';
+                        break;
+                    case 'memoryLimit':
+                        displayElement.textContent = value >= 1024 ? 
+                            (value / 1024).toFixed(1) + ' GB' : 
+                            value + ' MB';
+                        break;
+                    default:
+                        displayElement.textContent = value;
+                }
+            }
+        }
+
+        loadSystemInfo() {
+            const container = document.getElementById('systemInfo');
+            
+            const systemData = [
+                { label: 'Kira Version', value: 'v2.1.0' },
+                { label: 'Build', value: '2024.07.04' },
+                { label: 'Platform', value: 'Web Application' },
+                { label: 'Browser', value: navigator.userAgent.split(' ').slice(-1)[0] },
+                { label: 'Screen Resolution', value: `${screen.width}x${screen.height}` },
+                { label: 'Language', value: navigator.language },
+                { label: 'Timezone', value: Intl.DateTimeFormat().resolvedOptions().timeZone },
+                { label: 'Local Storage', value: this.getStorageUsage() }
+            ];
+
+            container.innerHTML = systemData.map(item => `
+                <div class="system-info-item">
+                    <span class="info-label">${item.label}</span>
+                    <span class="info-value">${item.value}</span>
+                </div>
+            `).join('');
+        }
+
+        getStorageUsage() {
+            try {
+                let total = 0;
+                for (let key in localStorage) {
+                    if (localStorage.hasOwnProperty(key)) {
+                        total += localStorage[key].length;
+                    }
+                }
+                return total > 1024 ? (total / 1024).toFixed(1) + ' KB' : total + ' B';
+            } catch (e) {
+                return 'Unknown';
+            }
+        }
+
+        setupAutoSave() {
+            // Auto-save when settings change
+            setInterval(() => {
+                if (this.hasChanges && this.settings.autoSave) {
+                    this.saveAllSettings();
+                }
+            }, 5000);
+        }
+
+        showChangesIndicator() {
+            this.hasChanges = true;
+            
+            // Show changes indicator
+            let indicator = document.querySelector('.settings-changed');
+            if (!indicator) {
+                indicator = document.createElement('div');
+                indicator.className = 'settings-changed';
+                indicator.innerHTML = `
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Unsaved changes</span>
+                    <button class="btn btn-sm btn-light ms-2" onclick="window.settingsDashboard.saveAllSettings()">
+                        Save Now
+                    </button>
+                `;
+                document.body.appendChild(indicator);
+            }
+            
+            indicator.classList.add('show');
+        }
+
+        hideChangesIndicator() {
+            this.hasChanges = false;
+            const indicator = document.querySelector('.settings-changed');
+            if (indicator) {
+                indicator.classList.remove('show');
+            }
+        }
+
+        async saveAllSettings() {
+            console.log('💾 Saving all settings...');
+            
+            try {
+                const response = await fetch(`${this.baseUrl}/save`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(this.settings)
+                });
+
+                if (response.ok) {
+                    this.hideChangesIndicator();
+                    this.showToast('Settings saved successfully!', 'success');
+                } else {
+                    throw new Error('Failed to save settings');
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+                this.showToast('Failed to save settings', 'error');
+            }
+        }
+
+        showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type === 'error' ? 'danger' : type} position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    }
+
+    // Global functions
+    function updateSetting(settingKey) {
+        const element = document.getElementById(settingKey);
+        if (!element || !window.settingsDashboard) return;
+
+        let value = element.value;
+        
+        if (element.type === 'checkbox') {
+            value = element.checked;
+        } else if (element.type === 'range') {
+            value = parseFloat(element.value);
+            window.settingsDashboard.updateRangeDisplay(settingKey, value);
+        }
+
+        window.settingsDashboard.settings[settingKey] = value;
+        window.settingsDashboard.showChangesIndicator();
+
+        console.log(`⚙️ Updated ${settingKey}:`, value);
+
+        // Apply immediate effects for certain settings
+        switch(settingKey) {
+            case 'theme':
+                applyTheme(value);
+                break;
+            case 'language':
+                // In a real app, this would change the interface language
+                break;
+            case 'animations':
+                document.body.style.transition = value ? 'all 0.3s ease' : 'none';
+                break;
+        }
+    }
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        
+        // Update overview stats
+        window.settingsDashboard?.loadSettingsOverview();
+    }
+
+    function toggleDarkMode() {
+        const enabled = document.getElementById('quickDarkMode').checked;
+        window.settingsDashboard.settings.darkMode = enabled;
+        window.settingsDashboard.showChangesIndicator();
+        
+        document.body.classList.toggle('dark-mode', enabled);
+        console.log('🌙 Dark mode:', enabled);
+    }
+
+    function toggleNotifications() {
+        const enabled = document.getElementById('quickNotifications').checked;
+        window.settingsDashboard.settings.notifications = enabled;
+        window.settingsDashboard.showChangesIndicator();
+        
+        console.log('🔔 Notifications:', enabled);
+    }
+
+    function toggleSounds() {
+        const enabled = document.getElementById('quickSounds').checked;
+        window.settingsDashboard.settings.sounds = enabled;
+        window.settingsDashboard.showChangesIndicator();
+        
+        console.log('🔊 Sound effects:', enabled);
+    }
+
+    function toggleAutoSave() {
+        const enabled = document.getElementById('quickAutoSave').checked;
+        window.settingsDashboard.settings.autoSave = enabled;
+        window.settingsDashboard.showChangesIndicator();
+        
+        console.log('💾 Auto-save:', enabled);
+    }
+
+    function saveAllSettings() {
+        window.settingsDashboard?.saveAllSettings();
+    }
+
+    function resetToDefaults() {
+        if (confirm('Reset all settings to default values?')) {
+            console.log('🔄 Resetting to defaults...');
+            window.settingsDashboard?.loadDefaultSettings();
+            window.settingsDashboard?.showChangesIndicator();
+        }
+    }
+
+    function changeAvatar() {
+        console.log('📷 Changing avatar...');
+        alert('Avatar selection will be implemented...');
+    }
+
+    function updateProfile(field) {
+        if (field) {
+            const value = document.getElementById(field).value;
+            console.log(`👤 Updated profile ${field}:`, value);
+        } else {
+            console.log('👤 Updating full profile...');
+            alert('Profile updated successfully!');
+        }
+    }
+
+    function exportSettings() {
+        console.log('📤 Exporting settings...');
+        const settings = window.settingsDashboard?.settings;
+        if (settings) {
+            const dataStr = JSON.stringify(settings, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'kira-settings.json';
+            link.click();
+            
+            URL.revokeObjectURL(url);
+        }
+    }
+
+    function importSettings() {
+        console.log('📥 Importing settings...');
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const settings = JSON.parse(event.target.result);
+                        window.settingsDashboard.settings = settings;
+                        window.settingsDashboard.applySettingsToUI();
+                        window.settingsDashboard.showChangesIndicator();
+                        alert('Settings imported successfully!');
+                    } catch (error) {
+                        alert('Invalid settings file!');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        };
+        input.click();
+    }
+
+    function createBackup() {
+        console.log('🛡️ Creating backup...');
+        alert('System backup will be created...');
+    }
+
+    function restoreBackup() {
+        console.log('📁 Restoring backup...');
+        alert('Backup restoration will be implemented...');
+    }
+
+    function clearCache() {
+        console.log('🧹 Clearing cache...');
+        if (confirm('Clear all cached data?')) {
+            localStorage.clear();
+            sessionStorage.clear();
+            alert('Cache cleared successfully!');
+        }
+    }
+
+    function resetSettings() {
+        console.log('🔄 Resetting settings...');
+        if (confirm('Reset ALL settings to factory defaults?')) {
+            window.settingsDashboard?.loadDefaultSettings();
+            window.settingsDashboard?.saveAllSettings();
+        }
+    }
+
+    function systemDiagnostics() {
+        console.log('🩺 Running system diagnostics...');
+        alert('System diagnostics will be implemented...');
+    }
+
+    function factoryReset() {
+        console.log('⚠️ Factory reset requested...');
+        if (confirm('FACTORY RESET will delete ALL data!\n\nThis action cannot be undone. Continue?')) {
+            if (confirm('Are you absolutely sure? This will reset everything!')) {
+                alert('Factory reset would be performed...');
+            }
+        }
+    }
+
+    // Initialize settings dashboard
+    document.addEventListener('DOMContentLoaded', () => {
+        window.settingsDashboard = new SettingsDashboard();
+    });
+</script>
+{% endblock %}

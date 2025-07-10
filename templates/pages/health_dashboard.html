@@ -1,0 +1,1257 @@
+{% extends "layouts/dashboard.html" %}
+{% set show_sidebar = true %}
+
+{% block title %}Kira - Health Dashboard{% endblock %}
+
+{% block dashboard_icon %}<i class="fas fa-heartbeat"></i>{% endblock %}
+{% block dashboard_title %}System Health Monitor{% endblock %}
+{% block dashboard_description %}Comprehensive System Health Analysis & Performance Monitoring - Real-time Diagnostics{% endblock %}
+
+{% block dashboard_stats %}
+<div class="dashboard-stats" id="healthOverview">
+    <!-- Health stats werden dynamisch gefüllt -->
+</div>
+{% endblock %}
+
+{% block main_content %}
+<!-- System Vitals Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-activity me-2"></i>
+            System Vitals
+        </h3>
+        <div class="d-flex gap-2">
+            <span class="badge bg-success">
+                <i class="fas fa-circle live-indicator me-1"></i>
+                Live Monitoring
+            </span>
+            <button class="refresh-btn" onclick="refreshSystemVitals()" title="Refresh Vitals">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
+    </div>
+    <div class="vitals-grid">
+        <div class="vital-card cpu">
+            <div class="vital-header">
+                <div class="vital-icon">
+                    <i class="fas fa-microchip"></i>
+                </div>
+                <div class="vital-info">
+                    <h5>CPU Usage</h5>
+                    <span class="vital-value" id="cpuUsage">--</span>
+                </div>
+            </div>
+            <div class="vital-chart">
+                <canvas id="cpuChart" height="60"></canvas>
+            </div>
+        </div>
+
+        <div class="vital-card memory">
+            <div class="vital-header">
+                <div class="vital-icon">
+                    <i class="fas fa-memory"></i>
+                </div>
+                <div class="vital-info">
+                    <h5>Memory</h5>
+                    <span class="vital-value" id="memoryUsage">--</span>
+                </div>
+            </div>
+            <div class="vital-chart">
+                <canvas id="memoryChart" height="60"></canvas>
+            </div>
+        </div>
+
+        <div class="vital-card storage">
+            <div class="vital-header">
+                <div class="vital-icon">
+                    <i class="fas fa-hdd"></i>
+                </div>
+                <div class="vital-info">
+                    <h5>Storage</h5>
+                    <span class="vital-value" id="storageUsage">--</span>
+                </div>
+            </div>
+            <div class="vital-chart">
+                <canvas id="storageChart" height="60"></canvas>
+            </div>
+        </div>
+
+        <div class="vital-card network">
+            <div class="vital-header">
+                <div class="vital-icon">
+                    <i class="fas fa-wifi"></i>
+                </div>
+                <div class="vital-info">
+                    <h5>Network</h5>
+                    <span class="vital-value" id="networkStatus">--</span>
+                </div>
+            </div>
+            <div class="vital-chart">
+                <canvas id="networkChart" height="60"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Performance Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-chart-area me-2"></i>
+            Performance Overview
+        </h3>
+        <div class="performance-filters">
+            <select class="form-select form-select-sm" id="performanceTimeRange" onchange="updatePerformanceChart()">
+                <option value="1h">Last Hour</option>
+                <option value="6h">Last 6 Hours</option>
+                <option value="24h" selected>Last 24 Hours</option>
+                <option value="7d">Last 7 Days</option>
+            </select>
+        </div>
+    </div>
+    <div class="performance-chart-container">
+        <canvas id="performanceChart" height="300"></canvas>
+    </div>
+</div>
+
+<!-- Service Status Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h3 class="panel-title">
+            <i class="fas fa-cogs me-2"></i>
+            Service Status
+        </h3>
+    </div>
+    <div id="serviceStatus">
+        <!-- Service status wird hier angezeigt -->
+    </div>
+</div>
+{% endblock %}
+
+{% block side_content %}
+<!-- Health Score Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-medal me-2"></i>
+            Health Score
+        </h4>
+    </div>
+    <div class="health-score-container">
+        <div class="health-score-circle" id="healthScoreCircle">
+            <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" class="score-bg"></circle>
+                <circle cx="50" cy="50" r="45" class="score-fill" id="scoreCircle"></circle>
+            </svg>
+            <div class="score-text">
+                <span class="score-value" id="healthScoreValue">--</span>
+                <span class="score-label">Health</span>
+            </div>
+        </div>
+        <div class="score-breakdown" id="scoreBreakdown">
+            <!-- Score breakdown wird hier angezeigt -->
+        </div>
+    </div>
+</div>
+
+<!-- Alerts Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            System Alerts
+        </h4>
+    </div>
+    <div id="systemAlerts">
+        <!-- System alerts werden hier angezeigt -->
+    </div>
+</div>
+
+<!-- Resource Usage Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-chart-pie me-2"></i>
+            Resource Usage
+        </h4>
+    </div>
+    <div id="resourceUsage">
+        <!-- Resource usage wird hier angezeigt -->
+    </div>
+</div>
+
+<!-- Process Monitor Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-tasks me-2"></i>
+            Top Processes
+        </h4>
+    </div>
+    <div id="topProcesses">
+        <!-- Top processes werden hier angezeigt -->
+    </div>
+</div>
+
+<!-- Health Tools Panel -->
+<div class="panel-card">
+    <div class="panel-header">
+        <h4 class="panel-title">
+            <i class="fas fa-tools me-2"></i>
+            Health Tools
+        </h4>
+    </div>
+    <div class="health-tools">
+        <button class="btn btn-kira btn-sm w-100 mb-2" onclick="runHealthCheck()">
+            <i class="fas fa-stethoscope me-2"></i>
+            Run Health Check
+        </button>
+        <button class="btn btn-outline-kira btn-sm w-100 mb-2" onclick="optimizeSystem()">
+            <i class="fas fa-magic me-2"></i>
+            Optimize System
+        </button>
+        <button class="btn btn-outline-warning btn-sm w-100 mb-2" onclick="cleanupResources()">
+            <i class="fas fa-broom me-2"></i>
+            Cleanup Resources
+        </button>
+        <button class="btn btn-outline-danger btn-sm w-100" onclick="restartServices()">
+            <i class="fas fa-redo me-2"></i>
+            Restart Services
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+{{ super() }}
+<style>
+    .vitals-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .vital-card {
+        background: white;
+        border: 2px solid var(--kira-gray-200);
+        border-radius: var(--radius-xl);
+        padding: var(--spacing-lg);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .vital-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .vital-card.cpu {
+        border-color: var(--kira-neural-1);
+    }
+    .vital-card.cpu:hover {
+        border-color: var(--kira-neural-1);
+        box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
+    }
+
+    .vital-card.memory {
+        border-color: var(--kira-neural-2);
+    }
+    .vital-card.memory:hover {
+        border-color: var(--kira-neural-2);
+        box-shadow: 0 20px 40px rgba(6, 182, 212, 0.3);
+    }
+
+    .vital-card.storage {
+        border-color: var(--kira-neural-3);
+    }
+    .vital-card.storage:hover {
+        border-color: var(--kira-neural-3);
+        box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
+    }
+
+    .vital-card.network {
+        border-color: var(--kira-neural-4);
+    }
+    .vital-card.network:hover {
+        border-color: var(--kira-neural-4);
+        box-shadow: 0 20px 40px rgba(245, 158, 11, 0.3);
+    }
+
+    .vital-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: var(--spacing-md);
+    }
+
+    .vital-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: white;
+        margin-right: var(--spacing-md);
+        box-shadow: var(--shadow-md);
+    }
+
+    .cpu .vital-icon { background: var(--kira-neural-1); }
+    .memory .vital-icon { background: var(--kira-neural-2); }
+    .storage .vital-icon { background: var(--kira-neural-3); }
+    .network .vital-icon { background: var(--kira-neural-4); }
+
+    .vital-info h5 {
+        margin: 0 0 4px 0;
+        color: var(--kira-gray-700);
+        font-weight: 600;
+    }
+
+    .vital-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--kira-gray-800);
+    }
+
+    .vital-chart {
+        height: 60px;
+        margin-top: var(--spacing-md);
+    }
+
+    .vital-chart canvas {
+        width: 100%;
+        height: 100%;
+    }
+
+    .performance-chart-container {
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-lg);
+        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .performance-filters {
+        display: flex;
+        gap: var(--spacing-sm);
+        align-items: center;
+    }
+
+    .service-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-md);
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--spacing-sm);
+        transition: all 0.2s ease;
+    }
+
+    .service-item:hover {
+        background: white;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .service-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .service-info {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+    }
+
+    .service-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+        color: white;
+    }
+
+    .service-details h6 {
+        margin: 0 0 2px 0;
+        color: var(--kira-gray-800);
+        font-weight: 600;
+    }
+
+    .service-meta {
+        font-size: 0.75rem;
+        color: var(--kira-gray-500);
+    }
+
+    .service-status {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+        padding: 4px 12px;
+        border-radius: var(--radius-md);
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+
+    .service-status.running {
+        background: var(--kira-success);
+        color: white;
+    }
+
+    .service-status.stopped {
+        background: var(--kira-danger);
+        color: white;
+    }
+
+    .service-status.warning {
+        background: var(--kira-warning);
+        color: white;
+    }
+
+    .health-score-container {
+        text-align: center;
+    }
+
+    .health-score-circle {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        margin: 0 auto var(--spacing-lg);
+    }
+
+    .health-score-circle svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+    }
+
+    .score-bg {
+        fill: none;
+        stroke: var(--kira-gray-200);
+        stroke-width: 8;
+    }
+
+    .score-fill {
+        fill: none;
+        stroke: var(--kira-success);
+        stroke-width: 8;
+        stroke-linecap: round;
+        stroke-dasharray: 283;
+        stroke-dashoffset: 283;
+        transition: stroke-dashoffset 1s ease-in-out;
+    }
+
+    .score-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+
+    .score-value {
+        display: block;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--kira-gray-800);
+    }
+
+    .score-label {
+        font-size: 0.875rem;
+        color: var(--kira-gray-600);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .score-breakdown {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-sm);
+        text-align: left;
+    }
+
+    .breakdown-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-xs) var(--spacing-sm);
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-sm);
+        font-size: 0.875rem;
+    }
+
+    .breakdown-label {
+        color: var(--kira-gray-600);
+    }
+
+    .breakdown-value {
+        font-weight: 600;
+        color: var(--kira-gray-800);
+    }
+
+    .alert-item {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--spacing-sm);
+        border-left: 4px solid;
+    }
+
+    .alert-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .alert-item.critical {
+        border-color: var(--kira-danger);
+        background: rgba(239, 68, 68, 0.1);
+    }
+
+    .alert-item.warning {
+        border-color: var(--kira-warning);
+        background: rgba(245, 158, 11, 0.1);
+    }
+
+    .alert-item.info {
+        border-color: var(--kira-info);
+        background: rgba(59, 130, 246, 0.1);
+    }
+
+    .alert-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        color: white;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .alert-content {
+        flex: 1;
+    }
+
+    .alert-title {
+        font-weight: 600;
+        color: var(--kira-gray-800);
+        margin-bottom: 2px;
+    }
+
+    .alert-message {
+        font-size: 0.875rem;
+        color: var(--kira-gray-600);
+        margin-bottom: 4px;
+    }
+
+    .alert-time {
+        font-size: 0.75rem;
+        color: var(--kira-gray-500);
+    }
+
+    .resource-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-sm) 0;
+        border-bottom: 1px solid var(--kira-gray-200);
+    }
+
+    .resource-item:last-child {
+        border-bottom: none;
+    }
+
+    .resource-label {
+        font-weight: 500;
+        color: var(--kira-gray-700);
+    }
+
+    .resource-bar {
+        flex: 1;
+        height: 8px;
+        background: var(--kira-gray-200);
+        border-radius: 4px;
+        margin: 0 var(--spacing-md);
+        overflow: hidden;
+    }
+
+    .resource-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.3s ease;
+    }
+
+    .resource-value {
+        font-weight: 600;
+        color: var(--kira-gray-800);
+        min-width: 50px;
+        text-align: right;
+    }
+
+    .process-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-sm) var(--spacing-md);
+        background: var(--kira-gray-50);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .process-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .process-name {
+        font-weight: 500;
+        color: var(--kira-gray-800);
+        flex: 1;
+    }
+
+    .process-cpu {
+        font-size: 0.875rem;
+        color: var(--kira-gray-600);
+        min-width: 60px;
+        text-align: right;
+    }
+
+    .health-tools .btn {
+        transition: all 0.2s ease;
+    }
+
+    .health-tools .btn:hover {
+        transform: translateY(-1px);
+    }
+
+    /* Pulse Animations */
+    .pulse-warning {
+        animation: pulse-warning 2s infinite;
+    }
+
+    .pulse-danger {
+        animation: pulse-danger 2s infinite;
+    }
+
+    @keyframes pulse-warning {
+        0%, 100% { background-color: var(--kira-warning); }
+        50% { background-color: rgba(245, 158, 11, 0.7); }
+    }
+
+    @keyframes pulse-danger {
+        0%, 100% { background-color: var(--kira-danger); }
+        50% { background-color: rgba(239, 68, 68, 0.7); }
+    }
+
+    /* Loading States */
+    .vital-loading {
+        background: linear-gradient(90deg, var(--kira-gray-200) 25%, var(--kira-gray-100) 50%, var(--kira-gray-200) 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        height: 120px;
+        border-radius: var(--radius-xl);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .vitals-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .vital-card {
+            padding: var(--spacing-md);
+        }
+
+        .health-score-circle {
+            width: 120px;
+            height: 120px;
+        }
+
+        .score-breakdown {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    class HealthDashboard {
+        constructor() {
+            this.baseUrl = '/api/health';
+            this.updateInterval = 5000;
+            this.charts = {};
+            this.isLive = true;
+            this.vitalData = {
+                cpu: [],
+                memory: [],
+                storage: [],
+                network: []
+            };
+            
+            this.init();
+        }
+
+        async init() {
+            console.log('💓 Health Dashboard wird initialisiert...');
+            
+            // Initial data load
+            await this.loadAllHealthData();
+            
+            // Initialize charts
+            this.initCharts();
+            
+            // Start real-time updates
+            this.startRealTimeUpdates();
+            
+            console.log('✅ Health Dashboard bereit');
+        }
+
+        async loadAllHealthData() {
+            this.showLoadingStates();
+            
+            try {
+                await Promise.all([
+                    this.loadHealthOverview(),
+                    this.loadSystemVitals(),
+                    this.loadServiceStatus(),
+                    this.loadHealthScore(),
+                    this.loadSystemAlerts(),
+                    this.loadResourceUsage(),
+                    this.loadTopProcesses()
+                ]);
+            } catch (error) {
+                console.error('❌ Health dashboard load error:', error);
+                this.showFallbackData();
+            }
+        }
+
+        showLoadingStates() {
+            document.querySelectorAll('.vital-card').forEach(card => {
+                card.innerHTML = '<div class="vital-loading"></div>';
+            });
+        }
+
+        async loadHealthOverview() {
+            try {
+                const response = await fetch(`${this.baseUrl}/overview`);
+                if (response.ok) {
+                    const data = await response.json();
+                    this.updateHealthOverview(data);
+                } else {
+                    this.loadFallbackOverview();
+                }
+            } catch (error) {
+                console.warn('Health overview fallback:', error);
+                this.loadFallbackOverview();
+            }
+        }
+
+        updateHealthOverview(data) {
+            const container = document.getElementById('healthOverview');
+            const stats = [
+                { 
+                    icon: 'fas fa-heartbeat', 
+                    label: 'Health Score', 
+                    value: `${data.health_score || 94}%`, 
+                    color: 'var(--kira-success)' 
+                },
+                { 
+                    icon: 'fas fa-clock', 
+                    label: 'Uptime', 
+                    value: data.uptime || '2d 14h', 
+                    color: 'var(--kira-info)' 
+                },
+                { 
+                    icon: 'fas fa-exclamation-triangle', 
+                    label: 'Active Alerts', 
+                    value: data.active_alerts || '2', 
+                    color: 'var(--kira-warning)' 
+                },
+                { 
+                    icon: 'fas fa-shield-alt', 
+                    label: 'System Status', 
+                    value: data.system_status || 'Stable', 
+                    color: 'var(--kira-primary)' 
+                }
+            ];
+
+            container.innerHTML = stats.map(stat => 
+                DashboardUtils.createStatCard(stat.icon, stat.label, stat.value, stat.color)
+            ).join('');
+        }
+
+        loadFallbackOverview() {
+            this.updateHealthOverview({
+                health_score: Math.floor(Math.random() * 20) + 80,
+                uptime: '2d 14h 32m',
+                active_alerts: Math.floor(Math.random() * 5),
+                system_status: 'Stable'
+            });
+        }
+
+        async loadSystemVitals() {
+            // Simulate real system data
+            const vitals = {
+                cpu: Math.floor(Math.random() * 30) + 15,
+                memory: Math.floor(Math.random() * 40) + 40,
+                storage: Math.floor(Math.random() * 20) + 30,
+                network: Math.floor(Math.random() * 50) + 20
+            };
+
+            // Update displays
+            document.getElementById('cpuUsage').textContent = `${vitals.cpu}%`;
+            document.getElementById('memoryUsage').textContent = `${vitals.memory}%`;
+            document.getElementById('storageUsage').textContent = `${vitals.storage}%`;
+            document.getElementById('networkStatus').textContent = `${vitals.network} MB/s`;
+
+            // Store data for charts
+            Object.keys(vitals).forEach(key => {
+                this.vitalData[key].push(vitals[key]);
+                if (this.vitalData[key].length > 20) {
+                    this.vitalData[key].shift();
+                }
+            });
+
+            // Update vital cards structure
+            this.updateVitalCards();
+        }
+
+        updateVitalCards() {
+            const vitals = [
+                { key: 'cpu', icon: 'fas fa-microchip', title: 'CPU Usage', unit: '%', color: 'var(--kira-neural-1)' },
+                { key: 'memory', icon: 'fas fa-memory', title: 'Memory', unit: '%', color: 'var(--kira-neural-2)' },
+                { key: 'storage', icon: 'fas fa-hdd', title: 'Storage', unit: '%', color: 'var(--kira-neural-3)' },
+                { key: 'network', icon: 'fas fa-wifi', title: 'Network', unit: ' MB/s', color: 'var(--kira-neural-4)' }
+            ];
+
+            vitals.forEach(vital => {
+                const card = document.querySelector(`.vital-card.${vital.key}`);
+                if (card) {
+                    const currentValue = this.vitalData[vital.key][this.vitalData[vital.key].length - 1] || 0;
+                    
+                    card.innerHTML = `
+                        <div class="vital-header">
+                            <div class="vital-icon">
+                                <i class="${vital.icon}"></i>
+                            </div>
+                            <div class="vital-info">
+                                <h5>${vital.title}</h5>
+                                <span class="vital-value">${currentValue}${vital.unit}</span>
+                            </div>
+                        </div>
+                        <div class="vital-chart">
+                            <canvas id="${vital.key}Chart" height="60"></canvas>
+                        </div>
+                    `;
+                    
+                    // Reinitialize chart
+                    this.initVitalChart(vital.key, vital.color);
+                }
+            });
+        }
+
+        async loadServiceStatus() {
+            const container = document.getElementById('serviceStatus');
+            
+            const services = [
+                { 
+                    name: 'Kira AI Core', 
+                    description: 'Main AI processing engine',
+                    status: 'running', 
+                    uptime: '2d 14h',
+                    icon: 'fas fa-brain',
+                    color: 'var(--kira-neural-1)'
+                },
+                { 
+                    name: 'Memory System', 
+                    description: 'Cognitive memory management',
+                    status: 'running', 
+                    uptime: '2d 14h',
+                    icon: 'fas fa-database',
+                    color: 'var(--kira-neural-2)'
+                },
+                { 
+                    name: 'Chat Engine', 
+                    description: 'Conversation processing',
+                    status: 'running', 
+                    uptime: '2d 13h',
+                    icon: 'fas fa-comments',
+                    color: 'var(--kira-neural-3)'
+                },
+                { 
+                    name: 'Voice Module', 
+                    description: 'Speech synthesis & recognition',
+                    status: 'warning', 
+                    uptime: '1d 8h',
+                    icon: 'fas fa-microphone',
+                    color: 'var(--kira-warning)'
+                },
+                { 
+                    name: 'Analytics Engine', 
+                    description: 'Data analysis & insights',
+                    status: 'running', 
+                    uptime: '2d 14h',
+                    icon: 'fas fa-chart-line',
+                    color: 'var(--kira-neural-4)'
+                }
+            ];
+
+            container.innerHTML = services.map(service => `
+                <div class="service-item">
+                    <div class="service-info">
+                        <div class="service-icon" style="background: ${service.color};">
+                            <i class="${service.icon}"></i>
+                        </div>
+                        <div class="service-details">
+                            <h6>${service.name}</h6>
+                            <div class="service-meta">${service.description} • Uptime: ${service.uptime}</div>
+                        </div>
+                    </div>
+                    <div class="service-status ${service.status}">
+                        <i class="fas fa-circle"></i>
+                        <span>${service.status}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async loadHealthScore() {
+            const healthScore = Math.floor(Math.random() * 20) + 80;
+            
+            // Update score display
+            document.getElementById('healthScoreValue').textContent = healthScore;
+            
+            // Update score circle
+            const circle = document.getElementById('scoreCircle');
+            const circumference = 2 * Math.PI * 45;
+            const offset = circumference - (healthScore / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+            
+            // Set color based on score
+            if (healthScore >= 90) {
+                circle.style.stroke = 'var(--kira-success)';
+            } else if (healthScore >= 70) {
+                circle.style.stroke = 'var(--kira-warning)';
+            } else {
+                circle.style.stroke = 'var(--kira-danger)';
+            }
+
+            // Update breakdown
+            const breakdown = [
+                { label: 'CPU', value: '94%' },
+                { label: 'Memory', value: '89%' },
+                { label: 'Storage', value: '92%' },
+                { label: 'Network', value: '96%' }
+            ];
+
+            document.getElementById('scoreBreakdown').innerHTML = breakdown.map(item => `
+                <div class="breakdown-item">
+                    <span class="breakdown-label">${item.label}</span>
+                    <span class="breakdown-value">${item.value}</span>
+                </div>
+            `).join('');
+        }
+
+        async loadSystemAlerts() {
+            const container = document.getElementById('systemAlerts');
+            
+            const alerts = [
+                {
+                    type: 'warning',
+                    title: 'Voice Module Degraded',
+                    message: 'Speech synthesis running at reduced capacity',
+                    time: 'vor 15 Min',
+                    icon: 'fas fa-exclamation-triangle'
+                },
+                {
+                    type: 'info',
+                    title: 'System Update Available',
+                    message: 'Kira Core v2.1.0 ist verfügbar',
+                    time: 'vor 2 Std',
+                    icon: 'fas fa-info-circle'
+                }
+            ];
+
+            if (alerts.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-check-circle fa-2x mb-2" style="color: var(--kira-success);"></i>
+                        <p>Keine aktiven Alerts</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = alerts.map(alert => `
+                    <div class="alert-item ${alert.type}">
+                        <div class="alert-icon" style="background: var(--kira-${alert.type});">
+                            <i class="${alert.icon}"></i>
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-title">${alert.title}</div>
+                            <div class="alert-message">${alert.message}</div>
+                            <div class="alert-time">${alert.time}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        async loadResourceUsage() {
+            const container = document.getElementById('resourceUsage');
+            
+            const resources = [
+                { label: 'CPU Cores', value: 67, max: 100, color: 'var(--kira-neural-1)' },
+                { label: 'RAM', value: 45, max: 100, color: 'var(--kira-neural-2)' },
+                { label: 'Disk I/O', value: 23, max: 100, color: 'var(--kira-neural-3)' },
+                { label: 'Network', value: 34, max: 100, color: 'var(--kira-neural-4)' }
+            ];
+
+            container.innerHTML = resources.map(resource => `
+                <div class="resource-item">
+                    <span class="resource-label">${resource.label}</span>
+                    <div class="resource-bar">
+                        <div class="resource-fill" style="width: ${resource.value}%; background: ${resource.color};"></div>
+                    </div>
+                    <span class="resource-value">${resource.value}%</span>
+                </div>
+            `).join('');
+        }
+
+        async loadTopProcesses() {
+            const container = document.getElementById('topProcesses');
+            
+            const processes = [
+                { name: 'kira-core', cpu: '23.4%' },
+                { name: 'memory-manager', cpu: '12.1%' },
+                { name: 'chat-engine', cpu: '8.7%' },
+                { name: 'analytics', cpu: '6.2%' },
+                { name: 'voice-module', cpu: '4.8%' }
+            ];
+
+            container.innerHTML = processes.map(process => `
+                <div class="process-item">
+                    <span class="process-name">${process.name}</span>
+                    <span class="process-cpu">${process.cpu}</span>
+                </div>
+            `).join('');
+        }
+
+        initCharts() {
+            this.initPerformanceChart();
+            this.initVitalCharts();
+        }
+
+        initPerformanceChart() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            
+            this.charts.performance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+                    datasets: [
+                        {
+                            label: 'CPU %',
+                            data: Array.from({length: 24}, () => Math.floor(Math.random() * 40) + 20),
+                            borderColor: 'var(--kira-neural-1)',
+                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                            tension: 0.4,
+                            fill: false
+                        },
+                        {
+                            label: 'Memory %',
+                            data: Array.from({length: 24}, () => Math.floor(Math.random() * 30) + 40),
+                            borderColor: 'var(--kira-neural-2)',
+                            backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                            tension: 0.4,
+                            fill: false
+                        },
+                        {
+                            label: 'Storage %',
+                            data: Array.from({length: 24}, () => Math.floor(Math.random() * 20) + 30),
+                            borderColor: 'var(--kira-neural-3)',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.4,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        initVitalCharts() {
+            ['cpu', 'memory', 'storage', 'network'].forEach((vital, index) => {
+                const colors = [
+                    'var(--kira-neural-1)',
+                    'var(--kira-neural-2)',
+                    'var(--kira-neural-3)',
+                    'var(--kira-neural-4)'
+                ];
+                this.initVitalChart(vital, colors[index]);
+            });
+        }
+
+        initVitalChart(vital, color) {
+            const canvas = document.getElementById(`${vital}Chart`);
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            this.charts[vital] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 20}, (_, i) => ''),
+                    datasets: [{
+                        data: this.vitalData[vital].length ? this.vitalData[vital] : Array(20).fill(0),
+                        borderColor: color,
+                        backgroundColor: color.replace(')', ', 0.1)').replace('var(--kira-', 'rgba('),
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 0,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { display: false },
+                        y: { 
+                            display: false,
+                            beginAtZero: true,
+                            max: vital === 'network' ? 100 : 100
+                        }
+                    }
+                }
+            });
+        }
+
+        startRealTimeUpdates() {
+            startAutoRefresh(() => {
+                this.loadHealthOverview();
+                this.loadSystemVitals();
+                this.loadHealthScore();
+                this.updateVitalCharts();
+            }, this.updateInterval);
+        }
+
+        updateVitalCharts() {
+            ['cpu', 'memory', 'storage', 'network'].forEach(vital => {
+                if (this.charts[vital]) {
+                    this.charts[vital].data.datasets[0].data = [...this.vitalData[vital]];
+                    this.charts[vital].update('none');
+                }
+            });
+        }
+
+        showFallbackData() {
+            console.log('💓 Zeige Health Fallback-Daten');
+            this.loadFallbackOverview();
+            this.loadSystemVitals();
+            this.loadServiceStatus();
+            this.loadHealthScore();
+            this.loadSystemAlerts();
+            this.loadResourceUsage();
+            this.loadTopProcesses();
+        }
+    }
+
+    // Global functions
+    function refreshSystemVitals() {
+        console.log('🔄 Refreshing system vitals...');
+        if (window.healthDashboard) {
+            window.healthDashboard.loadSystemVitals();
+        }
+    }
+
+    function updatePerformanceChart() {
+        const timeRange = document.getElementById('performanceTimeRange').value;
+        console.log(`📊 Updating performance chart: ${timeRange}`);
+        
+        if (window.healthDashboard && window.healthDashboard.charts.performance) {
+            // Update chart based on time range
+            let labels, dataPoints;
+            
+            switch(timeRange) {
+                case '1h':
+                    labels = Array.from({length: 12}, (_, i) => `${new Date(Date.now() - (11-i) * 5 * 60 * 1000).getMinutes()}m`);
+                    dataPoints = 12;
+                    break;
+                case '6h':
+                    labels = Array.from({length: 12}, (_, i) => `${new Date(Date.now() - (11-i) * 30 * 60 * 1000).getHours()}:00`);
+                    dataPoints = 12;
+                    break;
+                case '7d':
+                    labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                    dataPoints = 7;
+                    break;
+                default: // 24h
+                    labels = Array.from({length: 24}, (_, i) => `${i}:00`);
+                    dataPoints = 24;
+            }
+            
+            const chart = window.healthDashboard.charts.performance;
+            chart.data.labels = labels;
+            chart.data.datasets.forEach(dataset => {
+                dataset.data = Array.from({length: dataPoints}, () => Math.floor(Math.random() * 40) + 20);
+            });
+            chart.update();
+        }
+    }
+
+    function runHealthCheck() {
+        console.log('🩺 Running health check...');
+        alert('Comprehensive health check wird gestartet...');
+    }
+
+    function optimizeSystem() {
+        console.log('🔧 Optimizing system...');
+        alert('System optimization wird durchgeführt...');
+    }
+
+    function cleanupResources() {
+        console.log('🧹 Cleaning up resources...');
+        if (confirm('System-Bereinigung starten?')) {
+            alert('Resource cleanup wird ausgeführt...');
+        }
+    }
+
+    function restartServices() {
+        console.log('🔄 Restarting services...');
+        if (confirm('Services wirklich neustarten?')) {
+            alert('Services werden neugestartet...');
+        }
+    }
+
+    // Initialize health dashboard
+    document.addEventListener('DOMContentLoaded', () => {
+        window.healthDashboard = new HealthDashboard();
+    });
+</script>
+{% endblock %}

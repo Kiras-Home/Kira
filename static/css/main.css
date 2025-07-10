@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Kira Chat Dashboard{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="text-kira-primary">Chat Dashboard</h1>
+    <div class="kira-chat-widget" id="kiraChatWidget">
+        <button class="kira-chat-toggle" id="kiraChatToggle" onclick="toggleKiraChat()">
+            <i class="fas fa-comments"></i>
+        </button>
+        <div class="kira-chat-window" id="kiraChatWindow">
+            <!-- Chat content here -->
+        </div>
+    </div>
+</div>
+{% endblock %}
